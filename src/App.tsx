@@ -675,6 +675,11 @@ function App() {
     () => (localStorage.getItem("nectar-stopwatch-enabled") ?? localStorage.getItem("nectar-calendar-enabled")) !== "false",
   );
   const showClockColumn = settingsTimerEnabled || settingsStopwatchEnabled;
+  // Optional: show the Control Center beside the calendar instead of the Timer/Stopwatch column.
+  const [settingsCalendarControlCenter, setSettingsCalendarControlCenter] = useState(
+    () => localStorage.getItem("nectar-calendar-control-center") === "true",
+  );
+  const ccBesideCalendar = settingsCalendarEnabled && settingsCalendarControlCenter;
   const [settingsDualClockEnabled, setSettingsDualClockEnabled] = useState(() => localStorage.getItem("nectar-dual-clock-enabled") === "true");
   const [dualClockZone, setDualClockZone] = useState(() => localStorage.getItem("nectar-dual-clock-zone") || DEFAULT_DUAL_CLOCK_ZONE);
   const [dualClockLabel, setDualClockLabel] = useState(() => localStorage.getItem("nectar-dual-clock-label") || DEFAULT_DUAL_CLOCK_ZONE);
@@ -735,6 +740,7 @@ function App() {
       setSettingsTimerEnabled((getVal("nectar-timer-enabled") ?? getVal("nectar-calendar-enabled", "true")) !== "false");
       setSettingsTimerSoundEnabled(getVal("nectar-timer-sound-enabled", "true") !== "false");
       setSettingsStopwatchEnabled((getVal("nectar-stopwatch-enabled") ?? getVal("nectar-calendar-enabled", "true")) !== "false");
+      setSettingsCalendarControlCenter(getVal("nectar-calendar-control-center", "false") === "true");
       setSettingsDualClockEnabled(getVal("nectar-dual-clock-enabled", "false") === "true");
       setDualClockZone(getVal("nectar-dual-clock-zone") || DEFAULT_DUAL_CLOCK_ZONE);
       setDualClockLabel(getVal("nectar-dual-clock-label") || DEFAULT_DUAL_CLOCK_ZONE);
@@ -880,6 +886,7 @@ function App() {
       "nectar-timer-sound-enabled": setSettingsTimerSoundEnabled,
       "nectar-notch-timer-progress": setSettingsTimerProgressEnabled,
       "nectar-stopwatch-enabled": setSettingsStopwatchEnabled,
+      "nectar-calendar-control-center": setSettingsCalendarControlCenter,
       "nectar-dual-clock-enabled": setSettingsDualClockEnabled,
       "nectar-dual-clock-zone": (value) => setDualClockZone(String(value)),
       "nectar-dual-clock-label": (value) => setDualClockLabel(String(value)),
@@ -981,8 +988,9 @@ function App() {
   }, [windowLabel, startTour]);
 
   useEffect(() => {
-    if (ccView !== 'main' && (!isHovered || nectarMode !== 'command-center')) setCcView('main');
-  }, [ccView, isHovered, nectarMode]);
+    const ccOpen = nectarMode === 'command-center' || (nectarMode === 'calendar' && ccBesideCalendar);
+    if (ccView !== 'main' && (!isHovered || !ccOpen)) setCcView('main');
+  }, [ccView, isHovered, nectarMode, ccBesideCalendar]);
   const caldav = useCaldav();
 
   // Window height is now kept constant to prevent rendering layout lag and sharp corners
@@ -1305,11 +1313,11 @@ function App() {
 
   // Keep Wi-Fi fresh while the command center is open (keyboard toggle, Windows quick settings).
   useEffect(() => {
-    if (nectarMode !== 'command-center') return;
+    if (nectarMode !== 'command-center' && !(nectarMode === 'calendar' && ccBesideCalendar)) return;
     void refreshWifiStatus();
     const interval = setInterval(() => void refreshWifiStatus(), 5000);
     return () => clearInterval(interval);
-  }, [nectarMode, refreshWifiStatus]);
+  }, [nectarMode, ccBesideCalendar, refreshWifiStatus]);
 
   // Load bluetooth/volume/brightness state on mount
   useEffect(() => {
@@ -1715,6 +1723,7 @@ function App() {
   const getDynamicWidth = () => {
     if (nectarMode === 'tour') return 380;
     if (nectarMode === 'shelf') return Math.max(300, Math.min(120 + shelf.items.length * 62, 460));
+    if (isCalendarMode && ccBesideCalendar) return 660;
     if (isCalendarMode) return Math.max(settingsCalendarEnabled && showClockColumn ? 480 : settingsCalendarEnabled ? 310 : 270, 140 + dualClockExtra);
     if (nectarMode === 'command-center' && isHovered) {
       const totalWidgets = statusWidgets.left.length + statusWidgets.right.length;
@@ -1746,14 +1755,20 @@ function App() {
     }
     if (nectarMode === 'tour') return 210;
     if (nectarMode === 'shelf') return shelf.items.length === 0 ? 96 : 130;
-    if (nectarMode === 'calendar') return settingsCalendarEnabled ? (caldav.connected ? 350 : 310) : 262;
-    if (nectarMode === 'command-center') {
-      if (!isHovered) return 36;
+    const ccPanelHeight = () => {
       const tileRows = Math.ceil(ccResolved.tiles.length / 2);
       const tilesH = tileRows ? tileRows * 42 + (tileRows - 1) * 10 + 14 : 0;
       const buttonsH = ccResolved.buttons.length ? 44 : 0;
       const slidersH = ccResolved.sliders.length ? ccResolved.sliders.length * 22 + (ccResolved.sliders.length - 1) * 12 + 14 : 0;
       return 46 + tilesH + buttonsH + slidersH;
+    };
+    if (nectarMode === 'calendar') {
+      const base = settingsCalendarEnabled ? (caldav.connected ? 350 : 310) : 262;
+      return ccBesideCalendar ? Math.max(base, ccPanelHeight() + 16) : base;
+    }
+    if (nectarMode === 'command-center') {
+      if (!isHovered) return 36;
+      return ccPanelHeight();
     }
     if (nectarMode === 'status') return 36;
     if (isMusicMode && isHovered) {
@@ -1778,6 +1793,198 @@ function App() {
 
 
 
+
+  // Control Center contents, shared by the standalone panel and the calendar side column.
+  const controlCenterBody = (
+    <>
+      {showConnections && (
+        <ConnectionsView
+          kind={ccView}
+          onBack={() => setCcView('main')}
+          onOpenWindowsSettings={() => { invoke(ccView === 'wifi' ? 'open_wifi_settings' : ccView === 'audio' ? 'open_sound_settings' : 'open_bluetooth_settings'); }}
+        />
+      )}
+
+      <div style={{ display: showConnections ? 'none' : 'contents' }}>
+      {/* Pills Grid */}
+      <div className="cc-pills-grid" style={ccResolved.tiles.length ? undefined : { display: 'none' }}>
+        {/* Wi-Fi Pill */}
+        <div
+          className={`cc-pill-tile ${showLan || wifiEnabled ? 'active' : ''}`}
+          style={ccStyle("tiles", "network")}
+          onClick={(e) => { e.stopPropagation(); if (showLan) invoke('open_ethernet_settings'); else toggleWifi(); }}
+          onContextMenu={handleWifiRightClick}
+        >
+          <div className="cc-pill-icon-wrapper">
+            {showLan ? <EthernetIcon /> : <WifiIcon enabled={wifiEnabled} connected={wifiConnected} />}
+          </div>
+          <div className="cc-pill-info">
+            <span className="cc-pill-title">{showLan ? t('cc.ethernet') : t('cc.wifi')}</span>
+            <span className="cc-pill-status">{showLan ? t('connections.connected') : wifiStatus === null ? '…' : !wifiEnabled ? t('common.off') : wifiConnected ? t('connections.connected') : t('cc.notConnected')}</span>
+          </div>
+          {!settingsLegacyMode && !showLan && (
+            <span className="cc-pill-more" title={t("cc.networks")} onClick={(e) => { e.stopPropagation(); setCcView('wifi'); }}>›</span>
+          )}
+        </div>
+
+        {/* Dock Mode Pill */}
+        <div
+          className={`cc-pill-tile ${dockMode === 'fixed' ? 'active' : ''}`}
+          style={ccStyle("tiles", "dock-mode")}
+          onClick={toggleDockModeSetting}
+        >
+          <div className="cc-pill-icon-wrapper">
+            <DockIcon />
+          </div>
+          <div className="cc-pill-info">
+            <span className="cc-pill-title">{t("cc.dockMode")}</span>
+            <span className="cc-pill-status">{dockMode === 'fixed' ? t('common.fixed') : dockMode === 'smart' ? t('common.smart') : t('common.peek')}</span>
+          </div>
+        </div>
+
+        {/* Bluetooth Pill */}
+        <div
+          className={`cc-pill-tile ${bluetoothEnabled ? 'active' : ''}`}
+          style={ccStyle("tiles", "bluetooth")}
+          onClick={(e) => { e.stopPropagation(); toggleBluetooth(); }}
+          onContextMenu={handleBluetoothRightClick}
+        >
+          <div className="cc-pill-icon-wrapper">
+            <BluetoothIcon />
+          </div>
+          <div className="cc-pill-info">
+            <span className="cc-pill-title">{t("cc.bluetooth")}</span>
+            <span className="cc-pill-status">{bluetoothEnabled ? t('common.on') : t('common.off')}</span>
+          </div>
+          {!settingsLegacyMode && (
+            <span className="cc-pill-more" title={t("cc.devices")} onClick={(e) => { e.stopPropagation(); setCcView('bluetooth'); }}>›</span>
+          )}
+        </div>
+
+        {/* Notch Mode Pill */}
+        <div
+          className={`cc-pill-tile ${notchMode === 'fixed' ? 'active' : ''}`}
+          style={ccStyle("tiles", "notch-mode")}
+          onClick={toggleNotchModeSetting}
+        >
+          <div className="cc-pill-icon-wrapper">
+            <NotchIcon />
+          </div>
+          <div className="cc-pill-info">
+            <span className="cc-pill-title">{t("cc.notchMode")}</span>
+            <span className="cc-pill-status">{notchMode === 'fixed' ? t('common.fixed') : notchMode === 'smart' ? t('common.smart') : t('common.peek')}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Circular Actions Row */}
+      <div className="cc-circular-actions-row" style={ccResolved.buttons.length ? undefined : { display: 'none' }}>
+        <button
+          className={`cc-circular-btn ${dndActive ? 'active' : ''}`}
+          style={ccStyle("buttons", "dnd")}
+          {...tip(t("cc.dnd"))}
+          onClick={(e) => { e.stopPropagation(); setDndActive(prev => !prev); }}
+        >
+          <MoonIcon />
+        </button>
+        <button
+          className={`cc-circular-btn ${batterySaverEnabled ? 'active' : ''}`}
+          style={ccStyle("buttons", "battery-saver")}
+          {...tip(t("cc.batterySaver"))}
+          onClick={(e) => { e.stopPropagation(); openBatterySaverSettings(); }}
+        >
+          <BatterySaverIcon />
+        </button>
+        <button
+          className="cc-circular-btn"
+          style={ccStyle("buttons", "tray")}
+          {...tip(t("cc.tray"))}
+          onClick={(e) => { e.stopPropagation(); invoke("open_tray_window"); }}
+        >
+          <TrayIcon />
+        </button>
+        <button
+          className="cc-circular-btn"
+          style={ccStyle("buttons", "notifications")}
+          {...tip(t("cc.notifications"))}
+          onClick={(e) => { e.stopPropagation(); invoke("open_notification_center"); }}
+        >
+          <BellIcon />
+        </button>
+        <button
+          className="cc-circular-btn"
+          style={ccStyle("buttons", "settings")}
+          {...tip(t("cc.settings"))}
+          onClick={(e) => { e.stopPropagation(); openSettingsWindow(); }}
+        >
+          <SettingsIcon />
+        </button>
+        <button
+          className="cc-circular-btn"
+          style={ccStyle("buttons", "restart")}
+          {...tip(t("general.restart"))}
+          onClick={(e) => { e.stopPropagation(); invoke("restart_nectar"); }}
+        >
+          <ReloadIcon />
+        </button>
+      </div>
+
+      {/* Classic Sliders Area */}
+      <div className="cc-classic-sliders-area" style={ccResolved.sliders.length ? undefined : { display: 'none' }}>
+        {/* Volume Slider */}
+        <div className="cc-classic-slider-row" style={ccStyle("sliders", "volume")} onWheel={handleVolumeWheel}>
+          <div
+            className={`cc-classic-slider-label${settingsLegacyMode ? '' : ' clickable'}`}
+            title={settingsLegacyMode ? undefined : t('cc.outputDevice')}
+            onClick={settingsLegacyMode ? undefined : (e) => { e.stopPropagation(); setCcView('audio'); }}
+          >
+            <VolumeLowIcon style={{ opacity: 0.5 }} />
+            <span>{t("cc.volume")}</span>
+            {!settingsLegacyMode && <span className="cc-label-more">›</span>}
+          </div>
+          <div className="cc-classic-slider-track">
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={displayVolume}
+              onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+              className="cc-classic-input"
+            />
+            <div className="cc-classic-fill" style={{ width: `${displayVolume * 100}%` }} />
+          </div>
+          <span className="cc-classic-percentage">{Math.round(displayVolume * 100)}%</span>
+        </div>
+
+        {/* Brightness Slider */}
+        <div className="cc-classic-slider-row" style={ccStyle("sliders", "brightness")} onWheel={handleBrightnessWheel}>
+          <div className="cc-classic-slider-label">
+            <BrightnessLowIcon />
+            <span>{t("cc.brightness")}</span>
+          </div>
+          <div className="cc-classic-slider-track">
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value={currentBrightness}
+              onChange={(e) => handleBrightnessChange(parseInt(e.target.value))}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+              className="cc-classic-input"
+            />
+            <div className="cc-classic-fill" style={{ width: `${currentBrightness}%` }} />
+          </div>
+          <span className="cc-classic-percentage">{currentBrightness}%</span>
+        </div>
+      </div>
+      </div>
+    </>
+  );
 
   return (
     <div className="screen" style={{ overflow: 'hidden' }}>
@@ -2322,192 +2529,7 @@ function App() {
                     exit={{ opacity: 0, filter: "blur(4px)", transition: { duration: 0.1 } }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   >
-                    {showConnections && (
-                      <ConnectionsView
-                        kind={ccView}
-                        onBack={() => setCcView('main')}
-                        onOpenWindowsSettings={() => { invoke(ccView === 'wifi' ? 'open_wifi_settings' : ccView === 'audio' ? 'open_sound_settings' : 'open_bluetooth_settings'); }}
-                      />
-                    )}
-
-                    <div style={{ display: showConnections ? 'none' : 'contents' }}>
-                    {/* Pills Grid */}
-                    <div className="cc-pills-grid" style={ccResolved.tiles.length ? undefined : { display: 'none' }}>
-                      {/* Wi-Fi Pill */}
-                      <div
-                        className={`cc-pill-tile ${showLan || wifiEnabled ? 'active' : ''}`}
-                        style={ccStyle("tiles", "network")}
-                        onClick={(e) => { e.stopPropagation(); if (showLan) invoke('open_ethernet_settings'); else toggleWifi(); }}
-                        onContextMenu={handleWifiRightClick}
-                      >
-                        <div className="cc-pill-icon-wrapper">
-                          {showLan ? <EthernetIcon /> : <WifiIcon enabled={wifiEnabled} connected={wifiConnected} />}
-                        </div>
-                        <div className="cc-pill-info">
-                          <span className="cc-pill-title">{showLan ? t('cc.ethernet') : t('cc.wifi')}</span>
-                          <span className="cc-pill-status">{showLan ? t('connections.connected') : wifiStatus === null ? '…' : !wifiEnabled ? t('common.off') : wifiConnected ? t('connections.connected') : t('cc.notConnected')}</span>
-                        </div>
-                        {!settingsLegacyMode && !showLan && (
-                          <span className="cc-pill-more" title={t("cc.networks")} onClick={(e) => { e.stopPropagation(); setCcView('wifi'); }}>›</span>
-                        )}
-                      </div>
-
-                      {/* Dock Mode Pill */}
-                      <div
-                        className={`cc-pill-tile ${dockMode === 'fixed' ? 'active' : ''}`}
-                        style={ccStyle("tiles", "dock-mode")}
-                        onClick={toggleDockModeSetting}
-                      >
-                        <div className="cc-pill-icon-wrapper">
-                          <DockIcon />
-                        </div>
-                        <div className="cc-pill-info">
-                          <span className="cc-pill-title">{t("cc.dockMode")}</span>
-                          <span className="cc-pill-status">{dockMode === 'fixed' ? t('common.fixed') : dockMode === 'smart' ? t('common.smart') : t('common.peek')}</span>
-                        </div>
-                      </div>
-
-                      {/* Bluetooth Pill */}
-                      <div
-                        className={`cc-pill-tile ${bluetoothEnabled ? 'active' : ''}`}
-                        style={ccStyle("tiles", "bluetooth")}
-                        onClick={(e) => { e.stopPropagation(); toggleBluetooth(); }}
-                        onContextMenu={handleBluetoothRightClick}
-                      >
-                        <div className="cc-pill-icon-wrapper">
-                          <BluetoothIcon />
-                        </div>
-                        <div className="cc-pill-info">
-                          <span className="cc-pill-title">{t("cc.bluetooth")}</span>
-                          <span className="cc-pill-status">{bluetoothEnabled ? t('common.on') : t('common.off')}</span>
-                        </div>
-                        {!settingsLegacyMode && (
-                          <span className="cc-pill-more" title={t("cc.devices")} onClick={(e) => { e.stopPropagation(); setCcView('bluetooth'); }}>›</span>
-                        )}
-                      </div>
-
-                      {/* Notch Mode Pill */}
-                      <div
-                        className={`cc-pill-tile ${notchMode === 'fixed' ? 'active' : ''}`}
-                        style={ccStyle("tiles", "notch-mode")}
-                        onClick={toggleNotchModeSetting}
-                      >
-                        <div className="cc-pill-icon-wrapper">
-                          <NotchIcon />
-                        </div>
-                        <div className="cc-pill-info">
-                          <span className="cc-pill-title">{t("cc.notchMode")}</span>
-                          <span className="cc-pill-status">{notchMode === 'fixed' ? t('common.fixed') : notchMode === 'smart' ? t('common.smart') : t('common.peek')}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Circular Actions Row */}
-                    <div className="cc-circular-actions-row" style={ccResolved.buttons.length ? undefined : { display: 'none' }}>
-                      <button
-                        className={`cc-circular-btn ${dndActive ? 'active' : ''}`}
-                        style={ccStyle("buttons", "dnd")}
-                        {...tip(t("cc.dnd"))}
-                        onClick={(e) => { e.stopPropagation(); setDndActive(prev => !prev); }}
-                      >
-                        <MoonIcon />
-                      </button>
-                      <button
-                        className={`cc-circular-btn ${batterySaverEnabled ? 'active' : ''}`}
-                        style={ccStyle("buttons", "battery-saver")}
-                        {...tip(t("cc.batterySaver"))}
-                        onClick={(e) => { e.stopPropagation(); openBatterySaverSettings(); }}
-                      >
-                        <BatterySaverIcon />
-                      </button>
-                      <button
-                        className="cc-circular-btn"
-                        style={ccStyle("buttons", "tray")}
-                        {...tip(t("cc.tray"))}
-                        onClick={(e) => { e.stopPropagation(); invoke("open_tray_window"); }}
-                      >
-                        <TrayIcon />
-                      </button>
-                      <button
-                        className="cc-circular-btn"
-                        style={ccStyle("buttons", "notifications")}
-                        {...tip(t("cc.notifications"))}
-                        onClick={(e) => { e.stopPropagation(); invoke("open_notification_center"); }}
-                      >
-                        <BellIcon />
-                      </button>
-                      <button
-                        className="cc-circular-btn"
-                        style={ccStyle("buttons", "settings")}
-                        {...tip(t("cc.settings"))}
-                        onClick={(e) => { e.stopPropagation(); openSettingsWindow(); }}
-                      >
-                        <SettingsIcon />
-                      </button>
-                      <button
-                        className="cc-circular-btn"
-                        style={ccStyle("buttons", "restart")}
-                        {...tip(t("general.restart"))}
-                        onClick={(e) => { e.stopPropagation(); invoke("restart_nectar"); }}
-                      >
-                        <ReloadIcon />
-                      </button>
-                    </div>
-
-                    {/* Classic Sliders Area */}
-                    <div className="cc-classic-sliders-area" style={ccResolved.sliders.length ? undefined : { display: 'none' }}>
-                      {/* Volume Slider */}
-                      <div className="cc-classic-slider-row" style={ccStyle("sliders", "volume")} onWheel={handleVolumeWheel}>
-                        <div
-                          className={`cc-classic-slider-label${settingsLegacyMode ? '' : ' clickable'}`}
-                          title={settingsLegacyMode ? undefined : t('cc.outputDevice')}
-                          onClick={settingsLegacyMode ? undefined : (e) => { e.stopPropagation(); setCcView('audio'); }}
-                        >
-                          <VolumeLowIcon style={{ opacity: 0.5 }} />
-                          <span>{t("cc.volume")}</span>
-                          {!settingsLegacyMode && <span className="cc-label-more">›</span>}
-                        </div>
-                        <div className="cc-classic-slider-track">
-                          <input
-                            type="range"
-                            min="0"
-                            max="1"
-                            step="0.01"
-                            value={displayVolume}
-                            onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-                            onPointerDown={(e) => e.stopPropagation()}
-                            onClick={(e) => e.stopPropagation()}
-                            className="cc-classic-input"
-                          />
-                          <div className="cc-classic-fill" style={{ width: `${displayVolume * 100}%` }} />
-                        </div>
-                        <span className="cc-classic-percentage">{Math.round(displayVolume * 100)}%</span>
-                      </div>
-
-                      {/* Brightness Slider */}
-                      <div className="cc-classic-slider-row" style={ccStyle("sliders", "brightness")} onWheel={handleBrightnessWheel}>
-                        <div className="cc-classic-slider-label">
-                          <BrightnessLowIcon />
-                          <span>{t("cc.brightness")}</span>
-                        </div>
-                        <div className="cc-classic-slider-track">
-                          <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            step="1"
-                            value={currentBrightness}
-                            onChange={(e) => handleBrightnessChange(parseInt(e.target.value))}
-                            onPointerDown={(e) => e.stopPropagation()}
-                            onClick={(e) => e.stopPropagation()}
-                            className="cc-classic-input"
-                          />
-                          <div className="cc-classic-fill" style={{ width: `${currentBrightness}%` }} />
-                        </div>
-                        <span className="cc-classic-percentage">{currentBrightness}%</span>
-                      </div>
-                    </div>
-                    </div>
+                    {controlCenterBody}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -2569,12 +2591,18 @@ function App() {
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   >
                     {settingsCalendarEnabled && (
-                      <div className="calendar-column">
+                      <div className={`calendar-column${ccBesideCalendar ? " with-cc" : ""}`}>
                         <NotchCalendar caldav={caldav} hour12={!timeFormat24h} />
                       </div>
                     )}
 
-                    {showClockColumn && (
+                    {ccBesideCalendar && (
+                      <div className="calendar-cc-column">
+                        {controlCenterBody}
+                      </div>
+                    )}
+
+                    {showClockColumn && !ccBesideCalendar && (
                       <NotchClock
                         timerEnabled={settingsTimerEnabled}
                         stopwatchEnabled={settingsStopwatchEnabled}

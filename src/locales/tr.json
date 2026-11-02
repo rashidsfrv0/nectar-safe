@@ -47,6 +47,8 @@
   "notch.timer.desc": "Ön ayarlar ve özel süre ile geri sayım",
   "notch.timerSound": "Zamanlayıcı Sesi",
   "notch.timerSound.desc": "Zamanlayıcı bittiğinde ses çal",
+  "notch.calendarControlCenter": "Takvimin yanında Denetim Merkezi",
+  "notch.calendarControlCenter.desc": "Denetim Merkezini takvimin yanında göster, Zamanlayıcı ve Kronometre yerine geçer",
   "notch.stopwatch": "Kronometre",
   "notch.stopwatch.desc": "Turlar ile ileri sayım",
   "notch.dualClock": "İkinci Saat",

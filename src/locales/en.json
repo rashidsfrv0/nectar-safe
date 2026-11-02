@@ -47,6 +47,8 @@
   "notch.timer.desc": "Countdown with presets and a custom time",
   "notch.timerSound": "Timer Sound",
   "notch.timerSound.desc": "Play a chime when the timer finishes",
+  "notch.calendarControlCenter": "Control Center beside calendar",
+  "notch.calendarControlCenter.desc": "Show the Control Center next to the calendar, replacing Timer and Stopwatch",
   "notch.stopwatch": "Stopwatch",
   "notch.stopwatch.desc": "Count up with laps",
   "notch.dualClock": "Dual Clock",

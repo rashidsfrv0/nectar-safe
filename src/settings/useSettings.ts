@@ -38,6 +38,9 @@ export function useSettings() {
     () => localStorage.getItem("nectar-notch-timer-progress") !== "false"
   );
   const [stopwatchEnabled, setStopwatchEnabled] = useState(true);
+  const [calendarControlCenter, setCalendarControlCenter] = useState(
+    () => localStorage.getItem("nectar-calendar-control-center") === "true"
+  );
   const [dualClockEnabled, setDualClockEnabled] = useState(
     () => localStorage.getItem("nectar-dual-clock-enabled") === "true"
   );
@@ -220,6 +223,7 @@ export function useSettings() {
       apply(getVal("nectar-timer-sound-enabled"), setTimerSoundEnabled, readBool);
       apply(getVal("nectar-notch-timer-progress"), setNotchTimerProgress, readBool);
       apply(getVal("nectar-stopwatch-enabled") ?? getVal("nectar-calendar-enabled"), setStopwatchEnabled, readBool);
+      apply(getVal("nectar-calendar-control-center"), setCalendarControlCenter, readBool);
       apply(getVal("nectar-dual-clock-enabled"), setDualClockEnabled, readBool);
       apply(getVal("nectar-dual-clock-zone"), setDualClockZone, (v) => v);
       apply(getVal("nectar-dual-clock-label"), setDualClockLabel, (v) => v);
@@ -371,6 +375,7 @@ export function useSettings() {
     "nectar-timer-sound-enabled": setTimerSoundEnabled,
     "nectar-notch-timer-progress": setNotchTimerProgress,
     "nectar-stopwatch-enabled": setStopwatchEnabled,
+    "nectar-calendar-control-center": setCalendarControlCenter,
     "nectar-dual-clock-enabled": setDualClockEnabled,
     "nectar-dual-clock-zone": (v) => setDualClockZone(String(v)),
     "nectar-dual-clock-label": (v) => setDualClockLabel(String(v)),
@@ -557,6 +562,12 @@ export function useSettings() {
     const next = !stopwatchEnabled;
     setStopwatchEnabled(next);
     saveSetting("nectar-stopwatch-enabled", String(next));
+  };
+
+  const toggleCalendarControlCenter = () => {
+    const next = !calendarControlCenter;
+    setCalendarControlCenter(next);
+    saveSetting("nectar-calendar-control-center", String(next));
   };
 
   const toggleDualClock = () => {
@@ -1082,6 +1093,8 @@ export function useSettings() {
     toggleNotchTimerProgress,
     stopwatchEnabled,
     toggleStopwatchEnabled,
+    calendarControlCenter,
+    toggleCalendarControlCenter,
     dualClockEnabled,
     toggleDualClock,
     dualClockZone,

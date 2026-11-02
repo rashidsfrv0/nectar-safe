@@ -13,6 +13,7 @@ import {
   CloudCog,
   ChevronRight,
   Hourglass,
+  LayoutGrid,
   Timer,
   BellRing,
   Globe,
@@ -53,6 +54,8 @@ interface NotchTabProps {
   toggleNotchTimerProgress: () => void;
   stopwatchEnabled: boolean;
   toggleStopwatchEnabled: () => void;
+  calendarControlCenter: boolean;
+  toggleCalendarControlCenter: () => void;
   legacyMode: boolean;
   dualClockEnabled: boolean;
   toggleDualClock: () => void;
@@ -124,6 +127,8 @@ export function NotchTab({
   toggleNotchTimerProgress,
   stopwatchEnabled,
   toggleStopwatchEnabled,
+  calendarControlCenter,
+  toggleCalendarControlCenter,
   legacyMode,
   dualClockEnabled,
   toggleDualClock,
@@ -264,6 +269,15 @@ export function NotchTab({
             onClick={onOpenCalendarSync}
           >
             <ChevronRight size={14} strokeWidth={1.5} />
+          </SettingRow>
+        )}
+
+        {calendarEnabled && (
+          <SettingRow icon={LayoutGrid} label={t("notch.calendarControlCenter")} desc={t("notch.calendarControlCenter.desc")}>
+            <label className="toggle-switch">
+              <input type="checkbox" checked={calendarControlCenter} onChange={toggleCalendarControlCenter} />
+              <span className="slider"></span>
+            </label>
           </SettingRow>
         )}
 

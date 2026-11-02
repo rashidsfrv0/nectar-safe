@@ -2155,6 +2155,23 @@ img {
     padding-left: 0;
 }
 
+/* Control Center beside the calendar (replaces the Timer/Stopwatch column) */
+.calendar-column.with-cc {
+    flex: 0 0 235px;
+}
+
+.calendar-cc-column {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 1px solid var(--nectar-border, rgba(255, 255, 255, 0.1));
+    padding-left: 16px;
+    overflow: hidden;
+}
+
 .clock-tabs {
     display: flex;
     gap: 2px;

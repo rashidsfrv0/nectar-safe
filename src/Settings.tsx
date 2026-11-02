@@ -153,6 +153,8 @@ function SettingsApp() {
               toggleNotchTimerProgress={settings.toggleNotchTimerProgress}
               stopwatchEnabled={settings.stopwatchEnabled}
               toggleStopwatchEnabled={settings.toggleStopwatchEnabled}
+              calendarControlCenter={settings.calendarControlCenter}
+              toggleCalendarControlCenter={settings.toggleCalendarControlCenter}
               legacyMode={settings.legacyMode}
               dualClockEnabled={settings.dualClockEnabled}
               toggleDualClock={settings.toggleDualClock}
