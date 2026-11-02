@@ -301,7 +301,7 @@ body {
   justify-content: center;
   gap: 12px;
   padding: 8px 8px;
-  border-radius: 18px 18px 0 0;
+  border-radius: 18px;
   background: var(--nectar-bg, rgba(0, 0, 0, 0.8));
   border: none;
   color: var(--nectar-text, white);
@@ -343,6 +343,8 @@ body {
 
 .dock::before,
 .dock::after {
+  /* Floating dock: no edge-hugging flares */
+  display: none;
   content: "";
   position: absolute;
   bottom: 0;

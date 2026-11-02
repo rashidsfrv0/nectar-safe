@@ -13,6 +13,9 @@ use wmi::{COMLibrary, WMIConnection};
 
 static KEYBOARD_HOOK_APP_HANDLE: OnceLock<AppHandle> = OnceLock::new();
 
+/// Height the dock strip occupies: 56px bar + 8px floating gap (keep in sync with the paddingBottom in Dock.tsx).
+const DOCK_STRIP_HEIGHT: f64 = 64.0;
+
 /// Whether a HUD overlay is enabled. When it's off, its keys and the native flyout stay with Windows.
 fn overlay_enabled(app: &AppHandle, key: &str) -> bool {
     crate::utils::get_setting_str(app, key).map(|v| v != "false").unwrap_or(true)
@@ -1231,7 +1234,7 @@ pub fn setup_system_worker(app_handle: AppHandle) -> Sender<SystemCommand> {
                                                 let scale = cached_scale;
                                                 let d_left = (dr.x as f64 * scale) as i32;
                                                 let d_right = d_left + (dr.width as f64 * scale) as i32;
-                                                let res_h = (56.0 * scale) as i32;
+                                                let res_h = (DOCK_STRIP_HEIGHT * scale) as i32;
                                                 let trigger_y = screen_rect.bottom - res_h;
 
                                                 if rect.left < d_right - 4 && rect.right > d_left + 4 &&
@@ -1352,7 +1355,7 @@ pub fn setup_system_worker(app_handle: AppHandle) -> Sender<SystemCommand> {
                                 crate::state::dock_rects().lock().ok().and_then(|m| m.get(&label).copied()).is_some_and(|dr| {
                                     let d_left = mx + (dr.x as f64 * cached_scale) as i32;
                                     let d_right = d_left + (dr.width as f64 * cached_scale) as i32;
-                                    let trigger_y = screen.bottom - (56.0 * cached_scale) as i32;
+                                    let trigger_y = screen.bottom - (DOCK_STRIP_HEIGHT * cached_scale) as i32;
                                     rect.left < d_right - 4 && rect.right > d_left + 4 && rect.bottom > trigger_y + 4
                                 })
                             } else {
@@ -2874,7 +2877,7 @@ fn register_dock_appbar_inner(window: tauri::WebviewWindow, attempt: i32) {
             return;
         }
 
-        let pr = ((56.0 * nectar_scale) * scale) as i32;
+        let pr = ((DOCK_STRIP_HEIGHT * nectar_scale) * scale) as i32;
 
         
         unsafe {

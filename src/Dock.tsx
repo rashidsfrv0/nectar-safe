@@ -1095,7 +1095,7 @@ const Dock = memo(function Dock() {
 
   return (
     <div className={`dock-container ${isDragging ? 'dragging' : ''}`} onClick={closeMenu}>
-      <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
+      <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'flex-end', paddingBottom: 8, boxSizing: 'border-box' }}>
         <motion.div
           ref={dockRef}
           layout
@@ -1109,8 +1109,8 @@ const Dock = memo(function Dock() {
           height: isExpanded && !isHidden ? 'auto' : 34,
           borderTopLeftRadius: (isImpacted || isExpanded) && !isHidden ? 18 : 17,
           borderTopRightRadius: (isImpacted || isExpanded) && !isHidden ? 18 : 17,
-          borderBottomLeftRadius: (isImpacted || isExpanded) && !isHidden ? 0 : 17,
-          borderBottomRightRadius: (isImpacted || isExpanded) && !isHidden ? 0 : 17,
+          borderBottomLeftRadius: (isImpacted || isExpanded) && !isHidden ? 18 : 17,
+          borderBottomRightRadius: (isImpacted || isExpanded) && !isHidden ? 18 : 17,
           opacity: 1,
           scale: scale,
         }}
