@@ -4,7 +4,7 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use tauri::{AppHandle, Emitter, Manager};
 use windows::Win32::Foundation::{HWND, LPARAM, WPARAM};
 use windows::core::BOOL;
-use windows::Win32::UI::WindowsAndMessaging::{GetWindowThreadProcessId, IsWindowVisible, GetWindowLongW, GWL_EXSTYLE, WS_EX_TOOLWINDOW, WH_MOUSE_LL, MSLLHOOKSTRUCT, WM_MOUSEMOVE, WM_LBUTTONDOWN, SetWindowsHookExW, CallNextHookEx};
+use windows::Win32::UI::WindowsAndMessaging::{GetWindowThreadProcessId, IsWindowVisible, GetWindowLongW, GWL_EXSTYLE, WS_EX_TOOLWINDOW, WH_MOUSE_LL, MSLLHOOKSTRUCT, WM_MOUSEMOVE, WM_LBUTTONDOWN, WM_LBUTTONUP, SetWindowsHookExW, CallNextHookEx};
 use windows::Win32::Graphics::Dwm::{DwmGetWindowAttribute, DWMWA_EXTENDED_FRAME_BOUNDS};
 use windows::Win32::System::Threading::{OpenProcess, QueryFullProcessImageNameW, PROCESS_QUERY_LIMITED_INFORMATION, PROCESS_NAME_WIN32};
 use windows::Win32::Foundation::CloseHandle;
@@ -1653,6 +1653,16 @@ static MH_CACHED_DOCK_MON_SIZE: Mutex<Option<(u32, u32)>> = Mutex::new(None);
 static MH_CACHED_NOTCH_MON_POS: Mutex<Option<(i32, i32)>> = Mutex::new(None);
 static MH_CACHED_NOTCH_MON_SIZE: Mutex<Option<(u32, u32)>> = Mutex::new(None);
 static CAPTURE_UI_ACTIVE: AtomicBool = AtomicBool::new(false);
+
+/// Physical-pixel click box of the dock, as last computed by the hit-test (left, top, right, bottom).
+/// Empty (right <= left) whenever the dock is not on screen or not hit-testable.
+static DOCK_BOX_L: AtomicI32 = AtomicI32::new(0);
+static DOCK_BOX_T: AtomicI32 = AtomicI32::new(0);
+static DOCK_BOX_R: AtomicI32 = AtomicI32::new(0);
+static DOCK_BOX_B: AtomicI32 = AtomicI32::new(0);
+static DOCK_BOX_AT_MS: AtomicI64 = AtomicI64::new(0);
+/// Set when a left-button-down was swallowed, so the matching button-up is swallowed too.
+static DOCK_SWALLOWED_DOWN: AtomicBool = AtomicBool::new(false);
 static CAPTURE_RECHECK: AtomicBool = AtomicBool::new(true);
 static CAPTURE_LAST_SCAN_MS: AtomicI64 = AtomicI64::new(0);
 
@@ -1927,7 +1937,58 @@ unsafe extern "system" fn mouse_hook_proc(code: i32, wparam: WPARAM, lparam: LPA
             std::thread::spawn(|| crate::commands::send_win_chord(windows::Win32::UI::Input::KeyboardAndMouse::VK_D));
         }
     }
+    // Safety net: a click that lands on the dock while its window is still click-through must not
+    // activate whatever is behind the dock. Swallow it (and its button-up) and make the worker
+    // flip the window to interactive right away, so the next click goes to the dock.
+    if code >= 0 && !SHUTTING_DOWN.load(Ordering::Relaxed) {
+        if wparam.0 == WM_LBUTTONDOWN as usize {
+            let pt = (*(lparam.0 as *const MSLLHOOKSTRUCT)).pt;
+            if dock_click_would_fall_through(pt.x, pt.y) {
+                DOCK_SWALLOWED_DOWN.store(true, Ordering::Relaxed);
+                MOUSE_X.store(pt.x, Ordering::Relaxed);
+                MOUSE_Y.store(pt.y, Ordering::Relaxed);
+                MOUSE_DIRTY.store(true, Ordering::Relaxed);
+                if let Some(worker) = MOUSE_WORKER.get() {
+                    worker.unpark();
+                }
+                return windows::Win32::Foundation::LRESULT(1);
+            }
+        } else if wparam.0 == WM_LBUTTONUP as usize && DOCK_SWALLOWED_DOWN.swap(false, Ordering::Relaxed) {
+            return windows::Win32::Foundation::LRESULT(1);
+        }
+    }
     CallNextHookEx(None, code, wparam, lparam)
+}
+
+fn set_dock_click_box(click_box: Option<(i32, i32, i32, i32)>, now: i64) {
+    let (l, t, r, b) = match click_box {
+        Some((x, y, w, h)) => (x, y, x + w, y + h),
+        None => (0, 0, 0, 0),
+    };
+    DOCK_BOX_L.store(l, Ordering::Relaxed);
+    DOCK_BOX_T.store(t, Ordering::Relaxed);
+    DOCK_BOX_R.store(r, Ordering::Relaxed);
+    DOCK_BOX_B.store(b, Ordering::Relaxed);
+    DOCK_BOX_AT_MS.store(now, Ordering::Relaxed);
+}
+
+/// True when a click at (x, y) would fall through the dock onto the window behind it: the cursor
+/// is over the dock's click box but the dock window is still click-through. The click-through
+/// flip is queued to the UI thread, so it can lag a click that follows a fast move.
+/// The box must be fresh (the worker refreshes it on every pass) so a stalled worker can never
+/// make the dock swallow clicks indefinitely.
+fn dock_click_would_fall_through(x: i32, y: i32) -> bool {
+    if MH_LAST_DOCK_IGNORE.load(Ordering::Relaxed) != 1 || CAPTURE_UI_ACTIVE.load(Ordering::Relaxed) {
+        return false;
+    }
+    if now_ms() - DOCK_BOX_AT_MS.load(Ordering::Relaxed) > 2000 {
+        return false;
+    }
+    let l = DOCK_BOX_L.load(Ordering::Relaxed);
+    let t = DOCK_BOX_T.load(Ordering::Relaxed);
+    let r = DOCK_BOX_R.load(Ordering::Relaxed);
+    let b = DOCK_BOX_B.load(Ordering::Relaxed);
+    r > l && b > t && x >= l && x <= r && y >= t && y <= b
 }
 
 fn in_show_desktop_corner(x: i32, y: i32) -> bool {
@@ -2056,13 +2117,13 @@ unsafe fn process_mouse_move(app_handle: &AppHandle, cursor: windows::Win32::Fou
                             if let Ok(region) = crate::state::dock_rects().lock() {
                                 if let Some(r) = region.get("dock").copied() {
                                     let scale = dock_win.scale_factor().unwrap_or(1.0);
-                                    let pad_x = (5.0 * scale) as i32;
-                                    let pad_y_top = (8.0 * scale) as i32;
+                                    let pad_x = (8.0 * scale) as i32;
+                                    let pad_y_top = (12.0 * scale) as i32;
                                     let pad_y_bottom = (5.0 * scale) as i32;
                                     // Hysteresis keeps the dock interactive a little past
                                     // its bounds once grabbed, so removing the edge-forced
                                     // interactivity doesn't reintroduce boundary flicker.
-                                    let hyst = if MH_LAST_DOCK_IGNORE.load(Ordering::Relaxed) == 0 { (10.0 * scale) as i32 } else { 0 };
+                                    let hyst = if MH_LAST_DOCK_IGNORE.load(Ordering::Relaxed) == 0 { (14.0 * scale) as i32 } else { 0 };
                                     let rx = win_pos.x + (r.x as f64 * scale) as i32 - pad_x - hyst;
                                     let ry = win_pos.y + (r.y as f64 * scale) as i32 - pad_y_top - hyst;
                                     let rw = (r.width as f64 * scale) as i32 + (pad_x * 2) + (hyst * 2);
@@ -2127,6 +2188,9 @@ unsafe fn process_mouse_move(app_handle: &AppHandle, cursor: windows::Win32::Fou
                         MH_LAST_EDGE_HOVER.store(new_val, Ordering::Relaxed);
                     }
 
+                    // Feed the hook's safety net (empty while a fullscreen app hides the dock).
+                    set_dock_click_box(if dock_fg_fs { None } else { dbg_box }, now);
+
                     crate::diagnostics::hitbox_log(0, now, || format!(
                         "hit dock cursor=({},{}) window={:?} css_rect={:?} scale={} box={:?} interactive={} ignore_before={}",
                         cursor.x, cursor.y,
@@ -2146,6 +2210,7 @@ unsafe fn process_mouse_move(app_handle: &AppHandle, cursor: windows::Win32::Fou
                         MH_LAST_DOCK_IGNORE.store(new_ignore, Ordering::Relaxed);
                     }
                 } else {
+                    set_dock_click_box(None, now);
                     if MH_LAST_EDGE_HOVER.swap(0, Ordering::Relaxed) != 0 {
                         let _ = app_handle.emit_to("dock", "dock-edge-hover", false);
                     }
