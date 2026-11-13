@@ -69,6 +69,7 @@ pub async fn update_dock_rect(window: Window, rect: IntRect) {
     if let Ok(mut m) = crate::state::dock_rects().lock() {
         m.insert(window.label().to_string(), rect);
     }
+    crate::services::request_mouse_reevaluate();
 }
 
 #[tauri::command]
@@ -76,6 +77,7 @@ pub async fn update_notch_rect(window: Window, rect: IntRect) {
     if let Ok(mut m) = crate::state::notch_rects().lock() {
         m.insert(window.label().to_string(), rect);
     }
+    crate::services::request_mouse_reevaluate();
 }
 
 #[tauri::command]

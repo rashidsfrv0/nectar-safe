@@ -30,7 +30,7 @@ export function OverlaysTab({
       <SettingSection id="overlays-main" title={t("overlays.group")} defaultOpen>
         <SettingRow icon={Volume2} label={t("overlays.volume")} desc={t("overlays.volume.desc")}>
           <label className="toggle-switch">
-            <input type="checkbox" checked={volumeOverlayEnabled} onChange={toggleVolumeOverlay} />
+            <input role="switch" type="checkbox" checked={volumeOverlayEnabled} onChange={toggleVolumeOverlay} />
             <span className="slider"></span>
           </label>
         </SettingRow>
@@ -38,7 +38,7 @@ export function OverlaysTab({
         {volumeOverlayEnabled && (
           <SettingRow icon={ArrowLeftToLine} label={t("overlays.edgeHover")} desc={t("overlays.edgeHover.left")}>
             <label className="toggle-switch">
-              <input type="checkbox" checked={volumeEdgeEnabled} onChange={toggleVolumeEdge} />
+              <input role="switch" type="checkbox" checked={volumeEdgeEnabled} onChange={toggleVolumeEdge} />
               <span className="slider"></span>
             </label>
           </SettingRow>
@@ -46,7 +46,7 @@ export function OverlaysTab({
 
         <SettingRow icon={Sun} label={t("overlays.brightness")} desc={t("overlays.brightness.desc")}>
           <label className="toggle-switch">
-            <input type="checkbox" checked={brightnessOverlayEnabled} onChange={toggleBrightnessOverlay} />
+            <input role="switch" type="checkbox" checked={brightnessOverlayEnabled} onChange={toggleBrightnessOverlay} />
             <span className="slider"></span>
           </label>
         </SettingRow>
@@ -54,7 +54,7 @@ export function OverlaysTab({
         {brightnessOverlayEnabled && (
           <SettingRow icon={ArrowRightToLine} label={t("overlays.edgeHover")} desc={t("overlays.edgeHover.right")} divider={false}>
             <label className="toggle-switch">
-              <input type="checkbox" checked={brightnessEdgeEnabled} onChange={toggleBrightnessEdge} />
+              <input role="switch" type="checkbox" checked={brightnessEdgeEnabled} onChange={toggleBrightnessEdge} />
               <span className="slider"></span>
             </label>
           </SettingRow>

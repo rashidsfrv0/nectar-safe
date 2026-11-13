@@ -195,14 +195,14 @@ export function AboutTab({
       <div className="setting-group">
         <SettingRow icon={Download} label={t("about.autoUpdate")} desc={t("about.autoUpdate.desc")}>
           <label className="toggle-switch">
-            <input type="checkbox" checked={autoUpdate} onChange={toggleAutoUpdate} />
+            <input role="switch" type="checkbox" checked={autoUpdate} onChange={toggleAutoUpdate} />
             <span className="slider"></span>
           </label>
         </SettingRow>
 
         <SettingRow icon={FlaskConical} label={t("about.prerelease")} desc={t("about.prerelease.desc")}>
           <label className="toggle-switch">
-            <input type="checkbox" checked={prereleaseChannel} onChange={togglePrereleaseChannel} />
+            <input role="switch" type="checkbox" checked={prereleaseChannel} onChange={togglePrereleaseChannel} />
             <span className="slider"></span>
           </label>
         </SettingRow>
@@ -261,7 +261,7 @@ export function AboutTab({
           divider={false}
         >
           <label className="toggle-switch">
-            <input type="checkbox" checked={hitboxLogging} onChange={toggleHitboxLogging} />
+            <input role="switch" type="checkbox" checked={hitboxLogging} onChange={toggleHitboxLogging} />
             <span className="slider"></span>
           </label>
         </SettingRow>

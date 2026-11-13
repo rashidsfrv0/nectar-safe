@@ -230,7 +230,7 @@ export function NotchTab({
         {multiMonitor && (
           <SettingRow icon={Monitor} label={t("common.perMonitor")} desc={t("common.perMonitor.desc")}>
             <label className="toggle-switch">
-              <input type="checkbox" checked={perMonitor.enabled} onChange={perMonitor.toggle} />
+              <input role="switch" type="checkbox" checked={perMonitor.enabled} onChange={perMonitor.toggle} />
               <span className="slider"></span>
             </label>
           </SettingRow>
@@ -255,7 +255,7 @@ export function NotchTab({
       <SettingSection id="notch-calendar" title={t("notch.section.calendar")}>
         <SettingRow icon={Calendar} label={t("notch.calendar")} desc={t("notch.calendar.desc")}>
           <label className="toggle-switch">
-            <input type="checkbox" checked={calendarEnabled} onChange={toggleCalendar} />
+            <input role="switch" type="checkbox" checked={calendarEnabled} onChange={toggleCalendar} />
             <span className="slider"></span>
           </label>
         </SettingRow>
@@ -275,7 +275,7 @@ export function NotchTab({
         {calendarEnabled && (
           <SettingRow icon={LayoutGrid} label={t("notch.calendarControlCenter")} desc={t("notch.calendarControlCenter.desc")}>
             <label className="toggle-switch">
-              <input type="checkbox" checked={calendarControlCenter} onChange={toggleCalendarControlCenter} />
+              <input role="switch" type="checkbox" checked={calendarControlCenter} onChange={toggleCalendarControlCenter} />
               <span className="slider"></span>
             </label>
           </SettingRow>
@@ -283,7 +283,7 @@ export function NotchTab({
 
         <SettingRow icon={Hourglass} label={t("notch.timer")} desc={t("notch.timer.desc")}>
           <label className="toggle-switch">
-            <input type="checkbox" checked={timerEnabled} onChange={toggleTimerEnabled} />
+            <input role="switch" type="checkbox" checked={timerEnabled} onChange={toggleTimerEnabled} />
             <span className="slider"></span>
           </label>
         </SettingRow>
@@ -291,7 +291,7 @@ export function NotchTab({
         {timerEnabled && (
           <SettingRow icon={BellRing} label={t("notch.timerSound")} desc={t("notch.timerSound.desc")}>
             <label className="toggle-switch">
-              <input type="checkbox" checked={timerSoundEnabled} onChange={toggleTimerSound} />
+              <input role="switch" type="checkbox" checked={timerSoundEnabled} onChange={toggleTimerSound} />
               <span className="slider"></span>
             </label>
           </SettingRow>
@@ -300,7 +300,7 @@ export function NotchTab({
         {timerEnabled && (
           <SettingRow icon={Timer} label={t("notch.timerProgress")} desc={t("notch.timerProgress.desc")}>
             <label className="toggle-switch">
-              <input type="checkbox" checked={notchTimerProgress} onChange={toggleNotchTimerProgress} />
+              <input role="switch" type="checkbox" checked={notchTimerProgress} onChange={toggleNotchTimerProgress} />
               <span className="slider"></span>
             </label>
           </SettingRow>
@@ -308,7 +308,7 @@ export function NotchTab({
 
         <SettingRow icon={Timer} label={t("notch.stopwatch")} desc={t("notch.stopwatch.desc")}>
           <label className="toggle-switch">
-            <input type="checkbox" checked={stopwatchEnabled} onChange={toggleStopwatchEnabled} />
+            <input role="switch" type="checkbox" checked={stopwatchEnabled} onChange={toggleStopwatchEnabled} />
             <span className="slider"></span>
           </label>
         </SettingRow>
@@ -321,7 +321,7 @@ export function NotchTab({
               desc={dualClockEnabled ? [dualClockLabel, zoneOffsetLabel(dualClockZone)].filter(Boolean).join(" · ") : t("notch.dualClock.desc")}
             >
               <label className="toggle-switch">
-                <input type="checkbox" checked={dualClockEnabled} onChange={toggleDualClock} />
+                <input role="switch" type="checkbox" checked={dualClockEnabled} onChange={toggleDualClock} />
                 <span className="slider"></span>
               </label>
             </SettingRow>
@@ -340,7 +340,7 @@ export function NotchTab({
       <SettingSection id="notch-music" title={t("notch.section.music")}>
         <SettingRow icon={Music} label={t("notch.musicMode")} desc={t("notch.musicMode.desc")}>
           <label className="toggle-switch">
-            <input type="checkbox" checked={musicModeEnabled} onChange={toggleMusicMode} />
+            <input role="switch" type="checkbox" checked={musicModeEnabled} onChange={toggleMusicMode} />
             <span className="slider"></span>
           </label>
         </SettingRow>
@@ -349,7 +349,7 @@ export function NotchTab({
           <>
             <SettingRow icon={Minimize2} label={t("notch.compactMode")} desc={t("notch.compactMode.desc")}>
               <label className="toggle-switch">
-                <input type="checkbox" checked={musicCompactNotch} onChange={toggleMusicCompactNotch} />
+                <input role="switch" type="checkbox" checked={musicCompactNotch} onChange={toggleMusicCompactNotch} />
                 <span className="slider"></span>
               </label>
             </SettingRow>
@@ -367,14 +367,14 @@ export function NotchTab({
 
             <SettingRow icon={Sparkles} label={t("notch.ambientGlow")} desc={t("notch.ambientGlow.desc")}>
               <label className="toggle-switch">
-                <input type="checkbox" checked={mediaAmbienceEnabled} onChange={toggleAmbience} />
+                <input role="switch" type="checkbox" checked={mediaAmbienceEnabled} onChange={toggleAmbience} />
                 <span className="slider"></span>
               </label>
             </SettingRow>
 
             <SettingRow icon={Circle} label={t("notch.compactGlow")} desc={t("notch.compactGlow.desc")}>
               <label className="toggle-switch">
-                <input type="checkbox" checked={mediaCompactGlowEnabled} onChange={toggleCompactGlow} />
+                <input role="switch" type="checkbox" checked={mediaCompactGlowEnabled} onChange={toggleCompactGlow} />
                 <span className="slider"></span>
               </label>
             </SettingRow>
@@ -385,21 +385,21 @@ export function NotchTab({
       <SettingSection id="notch-panels" title={t("notch.section.panels")}>
         <SettingRow icon={Circle} label={t("notch.panelControlCenter")} desc={t("notch.panelControlCenter.desc")}>
               <label className="toggle-switch">
-                <input type="checkbox" checked={panelControlCenter} onChange={togglePanelControlCenter} />
+                <input role="switch" type="checkbox" checked={panelControlCenter} onChange={togglePanelControlCenter} />
                 <span className="slider"></span>
               </label>
             </SettingRow>
 
         <SettingRow icon={Circle} label={t("notch.panelShelf")} desc={t("notch.panelShelf.desc")}>
               <label className="toggle-switch">
-                <input type="checkbox" checked={panelShelf} onChange={togglePanelShelf} />
+                <input role="switch" type="checkbox" checked={panelShelf} onChange={togglePanelShelf} />
                 <span className="slider"></span>
               </label>
             </SettingRow>
 
         <SettingRow icon={Circle} label={t("notch.rememberMode")} desc={t("notch.rememberMode.desc")}>
               <label className="toggle-switch">
-                <input type="checkbox" checked={rememberMode} onChange={toggleRememberMode} />
+                <input role="switch" type="checkbox" checked={rememberMode} onChange={toggleRememberMode} />
                 <span className="slider"></span>
               </label>
             </SettingRow>
@@ -427,14 +427,14 @@ export function NotchTab({
       <SettingSection id="notch-controls" title={t("notch.section.controls")}>
         <SettingRow icon={Volume2} label={t("notch.scrollVolume")} desc={t("notch.scrollVolume.desc")}>
               <label className="toggle-switch">
-                <input type="checkbox" checked={notchScrollVolume} onChange={toggleNotchScrollVolume} />
+                <input role="switch" type="checkbox" checked={notchScrollVolume} onChange={toggleNotchScrollVolume} />
                 <span className="slider"></span>
               </label>
             </SettingRow>
 
         <SettingRow icon={Circle} label={t("notch.shelfPersist")} desc={t("notch.shelfPersist.desc")} divider={false}>
               <label className="toggle-switch">
-                <input type="checkbox" checked={shelfPersist} onChange={toggleShelfPersist} />
+                <input role="switch" type="checkbox" checked={shelfPersist} onChange={toggleShelfPersist} />
                 <span className="slider"></span>
               </label>
             </SettingRow>
@@ -448,7 +448,7 @@ export function NotchTab({
               <span className={tempUnitFahrenheit ? "active" : ""}>F</span>
             </div>
             <label className="toggle-switch">
-              <input type="checkbox" checked={weatherEnabled} onChange={toggleWeather} />
+              <input role="switch" type="checkbox" checked={weatherEnabled} onChange={toggleWeather} />
               <span className="slider"></span>
             </label>
           </div>

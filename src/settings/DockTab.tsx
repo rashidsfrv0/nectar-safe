@@ -144,7 +144,7 @@ export function DockTab({
       <SettingSection id="dock-main" title={t("dock.group")} defaultOpen>
         <SettingRow icon={Monitor} label={t("dock.enable")} desc={t("dock.enable.desc")}>
           <label className="toggle-switch">
-            <input type="checkbox" checked={dockEnabled} onChange={toggleDock} />
+            <input role="switch" type="checkbox" checked={dockEnabled} onChange={toggleDock} />
             <span className="slider"></span>
           </label>
         </SettingRow>
@@ -198,7 +198,7 @@ export function DockTab({
             {multiMonitor && (
               <SettingRow icon={Monitor} label={t("common.perMonitor")} desc={t("common.perMonitor.desc")}>
                 <label className="toggle-switch">
-                  <input type="checkbox" checked={perMonitor.enabled} onChange={perMonitor.toggle} />
+                  <input role="switch" type="checkbox" checked={perMonitor.enabled} onChange={perMonitor.toggle} />
                   <span className="slider"></span>
                 </label>
               </SettingRow>
@@ -227,21 +227,21 @@ export function DockTab({
           <SettingSection id="dock-shortcuts" title={t("dock.section.shortcuts")}>
             <SettingRow icon={Eye} label={t("dock.previews")} desc={t("dock.previews.desc")}>
               <label className="toggle-switch">
-                <input type="checkbox" checked={dockPreviewEnabled} onChange={toggleDockPreview} />
+                <input role="switch" type="checkbox" checked={dockPreviewEnabled} onChange={toggleDockPreview} />
                 <span className="slider"></span>
               </label>
             </SettingRow>
 
             <SettingRow icon={Search} label={t("dock.search")} desc={t("dock.search.desc")}>
               <label className="toggle-switch">
-                <input type="checkbox" checked={dockSearchEnabled} onChange={toggleDockSearch} />
+                <input role="switch" type="checkbox" checked={dockSearchEnabled} onChange={toggleDockSearch} />
                 <span className="slider"></span>
               </label>
             </SettingRow>
 
             <SettingRow icon={CalendarDays} label={t("dock.calendar")} desc={t("dock.calendar.desc")}>
               <label className="toggle-switch">
-                <input type="checkbox" checked={dockCalendarEnabled} onChange={toggleDockCalendar} />
+                <input role="switch" type="checkbox" checked={dockCalendarEnabled} onChange={toggleDockCalendar} />
                 <span className="slider"></span>
               </label>
             </SettingRow>
@@ -250,28 +250,28 @@ export function DockTab({
               <>
                 <SettingRow icon={ChevronUp} label={t("dock.tray")} desc={t("dock.tray.desc")}>
                   <label className="toggle-switch">
-                    <input type="checkbox" checked={dockTray} onChange={toggleDockTray} />
+                    <input role="switch" type="checkbox" checked={dockTray} onChange={toggleDockTray} />
                     <span className="slider"></span>
                   </label>
                 </SettingRow>
 
                 <SettingRow icon={LayoutGrid} label={t("dock.taskView")} desc={t("dock.taskView.desc")}>
                   <label className="toggle-switch">
-                    <input type="checkbox" checked={dockTaskView} onChange={toggleDockTaskView} />
+                    <input role="switch" type="checkbox" checked={dockTaskView} onChange={toggleDockTaskView} />
                     <span className="slider"></span>
                   </label>
                 </SettingRow>
 
                 <SettingRow icon={Monitor} label={t("dock.showDesktop")} desc={t("dock.showDesktop.desc")}>
                   <label className="toggle-switch">
-                    <input type="checkbox" checked={dockShowDesktop} onChange={toggleDockShowDesktop} />
+                    <input role="switch" type="checkbox" checked={dockShowDesktop} onChange={toggleDockShowDesktop} />
                     <span className="slider"></span>
                   </label>
                 </SettingRow>
 
                 <SettingRow icon={Trash2} label={t("dock.recycleBin")} desc={t("dock.recycleBin.desc")}>
                   <label className="toggle-switch">
-                    <input type="checkbox" checked={dockRecycle} onChange={toggleDockRecycle} />
+                    <input role="switch" type="checkbox" checked={dockRecycle} onChange={toggleDockRecycle} />
                     <span className="slider"></span>
                   </label>
                 </SettingRow>
@@ -284,7 +284,7 @@ export function DockTab({
                     desc={d.label ? `${d.label}${d.removable ? ` (${t("dock.drive.removableSuffix")})` : ""}` : d.removable ? t("dock.drive.removable") : t("dock.drive.local")}
                   >
                     <label className="toggle-switch">
-                      <input type="checkbox" checked={dockDrives.includes(d.letter)} onChange={() => toggleDockDrive(d.letter)} />
+                      <input role="switch" type="checkbox" checked={dockDrives.includes(d.letter)} onChange={() => toggleDockDrive(d.letter)} />
                       <span className="slider"></span>
                     </label>
                   </SettingRow>
@@ -297,14 +297,14 @@ export function DockTab({
           <SettingSection id="dock-style" title={t("dock.section.style")}>
             <SettingRow icon={Circle} label={t("dock.iconOnly")} desc={t("dock.iconOnly.desc")}>
               <label className="toggle-switch">
-                <input type="checkbox" checked={dockIconOnly} onChange={toggleDockIconOnly} />
+                <input role="switch" type="checkbox" checked={dockIconOnly} onChange={toggleDockIconOnly} />
                 <span className="slider"></span>
               </label>
             </SettingRow>
 
             <SettingRow icon={Keyboard} label={t("dock.winNumber")} desc={t("dock.winNumber.desc")}>
               <label className="toggle-switch">
-                <input type="checkbox" checked={dockWinNumberEnabled} onChange={toggleDockWinNumber} />
+                <input role="switch" type="checkbox" checked={dockWinNumberEnabled} onChange={toggleDockWinNumber} />
                 <span className="slider"></span>
               </label>
             </SettingRow>
@@ -312,7 +312,7 @@ export function DockTab({
             {dockMode === "fixed" && (
               <SettingRow icon={Maximize2} label={t("dock.adaptive")} desc={t("dock.adaptive.desc")}>
                 <label className="toggle-switch">
-                  <input type="checkbox" checked={dockAdaptive} onChange={toggleDockAdaptive} />
+                  <input role="switch" type="checkbox" checked={dockAdaptive} onChange={toggleDockAdaptive} />
                   <span className="slider"></span>
                 </label>
               </SettingRow>
@@ -324,7 +324,7 @@ export function DockTab({
               desc={dockMixedReorder ? t("dock.mixed.on") : t("dock.mixed.off")}
             >
               <label className="toggle-switch">
-                <input type="checkbox" checked={dockMixedReorder} onChange={toggleDockMixedReorder} />
+                <input role="switch" type="checkbox" checked={dockMixedReorder} onChange={toggleDockMixedReorder} />
                 <span className="slider"></span>
               </label>
             </SettingRow>

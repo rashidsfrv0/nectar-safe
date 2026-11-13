@@ -1744,6 +1744,22 @@ static MOUSE_Y: AtomicI32 = AtomicI32::new(0);
 static MOUSE_DIRTY: AtomicBool = AtomicBool::new(false);
 static MOUSE_WORKER: OnceLock<std::thread::Thread> = OnceLock::new();
 
+/// The mouse hook only fires on movement. When the dock or notch rect changes under a cursor that
+/// is standing still (expand/collapse animation, preview popup), the click-through state would stay
+/// stale and the next click would fall through to the window behind it. Call this after a rect
+/// update to re-run hit-testing at the cursor's current position.
+pub fn request_mouse_reevaluate() {
+    let mut pt = windows::Win32::Foundation::POINT::default();
+    if unsafe { windows::Win32::UI::WindowsAndMessaging::GetCursorPos(&mut pt) }.is_ok() {
+        MOUSE_X.store(pt.x, Ordering::Relaxed);
+        MOUSE_Y.store(pt.y, Ordering::Relaxed);
+    }
+    MOUSE_DIRTY.store(true, Ordering::Relaxed);
+    if let Some(worker) = MOUSE_WORKER.get() {
+        worker.unpark();
+    }
+}
+
 /// Hover intent for the top edge: touching the band starts a dwell clock, and the edge only arms
 /// (peek, claim input) after resting there for nectar-notch-edge-delay ms (0 = instant).
 /// Stops a pass-through to a maximized window's title bar from triggering it.
@@ -2037,7 +2053,7 @@ unsafe fn process_mouse_move(app_handle: &AppHandle, cursor: windows::Win32::Fou
                                          cursor.y >= win_pos.y && cursor.y <= (win_pos.y + win_size.height as i32);
 
                         if in_window {
-                            if let Ok(region) = crate::state::dock_rects().try_lock() {
+                            if let Ok(region) = crate::state::dock_rects().lock() {
                                 if let Some(r) = region.get("dock").copied() {
                                     let scale = dock_win.scale_factor().unwrap_or(1.0);
                                     let pad_x = (5.0 * scale) as i32;
@@ -2165,7 +2181,7 @@ unsafe fn process_mouse_move(app_handle: &AppHandle, cursor: windows::Win32::Fou
                         let main_rect_val = crate::state::main_window_rects().lock().ok().and_then(|m| m.get("main").copied());
 
                         if let Some((win_pos, _)) = main_rect_val {
-                            if let Ok(region) = crate::state::notch_rects().try_lock() {
+                            if let Ok(region) = crate::state::notch_rects().lock() {
                                 if let Some(r) = region.get("main").copied() {
                                     let scale = main_win.scale_factor().unwrap_or(1.0);
                                     let pad_x = (20.0 * scale) as i32;

@@ -20,6 +20,8 @@ import type { SettingsTab } from "./settings/index";
 import { initTheme } from "./theme";
 import { useT } from "./i18n";
 import "./Settings.css";
+import "./design-tokens.css";
+import "./ios-settings.css";
 
 const appWindow = getCurrentWebviewWindow();
 
@@ -78,22 +80,27 @@ function SettingsApp() {
       </div>
 
       <div className="settings-body">
-        <div className="settings-sidebar">
+        <nav className="settings-sidebar" aria-label={t("settings.title")}>
           {TABS.map(({ id, labelKey, icon: Icon }) => (
             <button
               key={id}
+              data-tab={id}
+              aria-current={activeTab === id || (id === "notch" && activeTab === "calendar-sync") ? "page" : undefined}
               className={`sidebar-tab ${activeTab === id || (id === "notch" && activeTab === "calendar-sync") ? "active" : ""}`}
               onClick={() => setActiveTab(id)}
             >
-              <div className="sidebar-tab-icon">
+              <div className="sidebar-tab-icon" aria-hidden="true">
                 <Icon size={14} strokeWidth={1.5} />
               </div>
               <span>{t(labelKey)}</span>
             </button>
           ))}
-        </div>
+        </nav>
 
         <div className="settings-content">
+          {activeTab !== "calendar-sync" && (
+            <h1 className="settings-large-title">{t(TABS.find((x) => x.id === activeTab)?.labelKey ?? "settings.title")}</h1>
+          )}
           {activeTab === "general" && (
             <GeneralTab
               autostart={settings.autostart}

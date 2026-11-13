@@ -410,7 +410,7 @@ const Dock = memo(function Dock() {
       clearInterval(poll);
       cancelAnimationFrame(rafId);
     };
-  }, [pinnedApps, activeApps, isHidden, previewData, scale]);
+  }, [pinnedApps, activeApps, isHidden, isExpanded, previewData, scale]);
 
   const refreshDockMode = () => {
     invoke<string>('get_dock_mode_for_window').then(setDockMode).catch(() => {});

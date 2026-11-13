@@ -1,4 +1,5 @@
 import { Power, Download, Clock, History, BatteryWarning, RefreshCw, LogOut, Languages } from "lucide-react";
+import { sliderFill } from "./sliderFill";
 import { SettingRow } from "./SettingRow";
 import { SettingSection } from "./SettingSection";
 import { Dropdown } from "./Dropdown";
@@ -45,14 +46,14 @@ export function GeneralTab({
       <SettingSection id="general-system" title={t("general.system")} defaultOpen>
         <SettingRow icon={Power} label={t("general.launchAtLogin")} desc={t("general.launchAtLogin.desc")}>
           <label className="toggle-switch">
-            <input type="checkbox" checked={autostart} onChange={toggleAutostart} />
+            <input role="switch" type="checkbox" checked={autostart} onChange={toggleAutostart} />
             <span className="slider"></span>
           </label>
         </SettingRow>
 
         <SettingRow icon={Download} label={t("general.updateIndicator")} desc={t("general.updateIndicator.desc")}>
           <label className="toggle-switch">
-            <input type="checkbox" checked={showUpdateIndicator} onChange={toggleUpdateIndicator} />
+            <input role="switch" type="checkbox" checked={showUpdateIndicator} onChange={toggleUpdateIndicator} />
             <span className="slider"></span>
           </label>
         </SettingRow>
@@ -63,7 +64,7 @@ export function GeneralTab({
 
         <SettingRow icon={Clock} label={t("general.time24h")} desc={t("general.time24h.desc")}>
           <label className="toggle-switch">
-            <input type="checkbox" checked={timeFormat24h} onChange={toggleTimeFormat24h} />
+            <input role="switch" type="checkbox" checked={timeFormat24h} onChange={toggleTimeFormat24h} />
             <span className="slider"></span>
           </label>
         </SettingRow>
@@ -75,7 +76,7 @@ export function GeneralTab({
           divider={hasBattery}
         >
           <label className="toggle-switch">
-            <input type="checkbox" checked={legacyMode} onChange={toggleLegacyMode} />
+            <input role="switch" type="checkbox" checked={legacyMode} onChange={toggleLegacyMode} />
             <span className="slider"></span>
           </label>
         </SettingRow>
@@ -95,6 +96,7 @@ export function GeneralTab({
               value={lowBatteryThreshold}
               onChange={(e) => handleThresholdChange(parseInt(e.target.value))}
               className="settings-slider"
+              style={sliderFill(lowBatteryThreshold, 5, 50)}
             />
           </SettingRow>
         )}

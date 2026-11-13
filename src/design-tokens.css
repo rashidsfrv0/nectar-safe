@@ -1,0 +1,53 @@
+/*
+ * Nectar design tokens (iOS-inspired).
+ * Shared by Settings now; Dock / Calendar / Notch can adopt them later.
+ * Colours deliberately NOT redefined here: theme.ts owns --nectar-* (bg, text,
+ * border, accent) so user themes keep working.
+ */
+:root {
+  /* Typography: system stacks only (no network fonts in a Tauri app) */
+  --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --ios-font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  --text-caption: 12px;
+  --text-footnote: 13px;
+  --text-body: 14px;
+  --text-headline: 15px;
+  --text-title: 28px;
+
+  /* Spacing (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+
+  /* Shape */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --ios-row-height: 44px;
+
+  /* Motion: distinct durations per purpose, never one value for everything */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+  --ease-ios: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Semantic colours that are not theme-dependent */
+  --ios-green: #34c759;
+  --ios-red: #ff453a;
+  --ios-fill: rgba(120, 120, 128, 0.32);
+  --ios-fill-soft: rgba(127, 127, 127, 0.14);
+  --ios-fill-strong: rgba(127, 127, 127, 0.22);
+  --ios-separator: rgba(127, 127, 127, 0.22);
+
+  /* Sidebar tab colours (iOS Settings palette) */
+  --tab-general: #8e8e93;
+  --tab-appearance: #0a84ff;
+  --tab-notch: #5e5ce6;
+  --tab-dock: #ff9f0a;
+  --tab-overlays: #30b050;
+  --tab-about: #636366;
+}

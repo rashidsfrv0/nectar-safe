@@ -1,0 +1,400 @@
+/*
+ * iOS-style layer for the Settings window.
+ * Loaded AFTER Settings.css, so same-specificity rules here win. Where the
+ * original used compound / .light-mode selectors, rules are prefixed with
+ * .settings-container to out-rank them. Fills use neutral rgba(127,127,127,x)
+ * so they read correctly in both dark and light themes.
+ */
+
+body {
+  font-family: var(--ios-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+.settings-container {
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45), 0 0 0 0.5px rgba(255, 255, 255, 0.06) inset;
+}
+
+/* ---------- Accessibility: focus + reduced motion ---------- */
+
+.settings-container :focus-visible {
+  outline: 2px solid var(--nectar-accent, #0a84ff);
+  outline-offset: 2px;
+}
+
+.settings-container .setting-group-label.setting-section-header:focus-visible {
+  outline: 2px solid var(--nectar-accent, #0a84ff);
+  outline-offset: -2px;
+  box-shadow: none;
+}
+
+.settings-container .setting-item.action:focus-visible,
+.settings-container .sidebar-tab:focus-visible,
+.settings-container .dropdown-item:focus-visible {
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-container *,
+  .settings-container *::before,
+  .settings-container *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* A spinner is information, not decoration: keep it, but slow it down. */
+  .settings-container .searching-spinner {
+    animation-duration: 1.4s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
+
+/* ---------- Title bar ---------- */
+
+.settings-container .title-bar {
+  position: relative;
+  height: 38px;
+}
+
+.settings-container .title-text {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--text-footnote);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+/* ---------- Sidebar (iPadOS style) ---------- */
+
+.settings-container .settings-sidebar {
+  width: 184px;
+  padding: var(--space-3) 10px;
+  gap: 2px;
+  background: var(--ios-fill-soft);
+  border-right: 1px solid var(--ios-separator);
+}
+
+.settings-container .sidebar-tab {
+  min-height: 38px;
+  padding: 6px 8px;
+  gap: 10px;
+  border-radius: 10px;
+  font-size: var(--text-body);
+  font-weight: 500;
+  opacity: 1;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-ios);
+}
+
+.settings-container .sidebar-tab:hover {
+  background: var(--ios-fill-soft);
+}
+
+.settings-container .sidebar-tab:active {
+  background: var(--ios-fill-strong);
+}
+
+.settings-container .sidebar-tab.active {
+  background: var(--ios-fill-strong);
+  font-weight: 600;
+}
+
+/* Coloured squircle icon with white glyph, like iOS Settings */
+.settings-container .sidebar-tab .sidebar-tab-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: var(--tab-general);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), inset 0 0 0 0.5px rgba(255, 255, 255, 0.18);
+}
+
+.settings-container .sidebar-tab .sidebar-tab-icon svg,
+.settings-container .sidebar-tab:hover .sidebar-tab-icon svg,
+.settings-container .sidebar-tab.active .sidebar-tab-icon svg {
+  stroke: #fff;
+  color: #fff;
+}
+
+.settings-container .sidebar-tab[data-tab="general"] .sidebar-tab-icon { background: var(--tab-general); }
+.settings-container .sidebar-tab[data-tab="appearance"] .sidebar-tab-icon { background: var(--tab-appearance); }
+.settings-container .sidebar-tab[data-tab="notch"] .sidebar-tab-icon { background: var(--tab-notch); }
+.settings-container .sidebar-tab[data-tab="dock"] .sidebar-tab-icon { background: var(--tab-dock); }
+.settings-container .sidebar-tab[data-tab="overlays"] .sidebar-tab-icon { background: var(--tab-overlays); }
+.settings-container .sidebar-tab[data-tab="about"] .sidebar-tab-icon { background: var(--tab-about); }
+
+/* ---------- Content, large title ---------- */
+
+.settings-container .settings-content {
+  padding: var(--space-2) var(--space-4) var(--space-5);
+}
+
+.settings-large-title {
+  margin: var(--space-1) 6px var(--space-3);
+  font-family: var(--ios-font-display);
+  font-size: var(--text-title);
+  line-height: 34px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--nectar-text, #fff);
+  cursor: default;
+}
+
+/* ---------- Grouped lists ---------- */
+
+.settings-container .setting-group {
+  border-radius: var(--radius-md);
+  border: 0.5px solid var(--ios-separator);
+}
+
+.settings-container .setting-item {
+  min-height: var(--ios-row-height);
+  padding: 6px 14px;
+  box-sizing: border-box;
+}
+
+.settings-container .setting-label {
+  font-size: var(--text-body);
+  font-weight: 400;
+}
+
+.settings-container .setting-desc {
+  font-size: var(--text-caption);
+  line-height: 1.35;
+  opacity: 1;
+}
+
+.settings-container .setting-divider {
+  height: 1px;
+  margin-left: 54px;
+  background: var(--ios-separator);
+}
+
+/* Tinted squircle behind row icons */
+.settings-container .setting-icon-bg {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--nectar-accent, #0a84ff) 20%, transparent);
+  color: var(--nectar-accent, #0a84ff);
+}
+
+.settings-container .setting-item:hover .setting-icon-bg {
+  color: var(--nectar-accent, #0a84ff);
+}
+
+/* Collapsible section header: keep fused-card pattern, iOS sizing */
+.settings-container .setting-group-label.setting-section-header {
+  min-height: var(--ios-row-height);
+  box-sizing: border-box;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  border: 0.5px solid var(--ios-separator);
+  font-size: var(--text-footnote);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.settings-container .setting-section:not(.collapsed) > .setting-group-label.setting-section-header {
+  border-bottom: none;
+}
+
+/* Action rows (Restart, Quit, ...) */
+.settings-container .setting-item.action {
+  transition: background-color var(--dur-fast) var(--ease-ios);
+}
+
+.settings-container .setting-item.action:hover {
+  background: var(--ios-fill-soft);
+}
+
+.settings-container .setting-item.action:active {
+  background: var(--ios-fill-strong);
+}
+
+.settings-container .setting-item.action.danger .setting-icon-bg {
+  background: rgba(255, 69, 58, 0.18);
+  color: var(--ios-red);
+}
+
+/* ---------- Switch (iOS UISwitch) ---------- */
+
+.settings-container .toggle-switch {
+  width: 46px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.settings-container .slider {
+  background-color: var(--ios-fill);
+  border: none;
+  border-radius: 28px;
+  transition: background-color var(--dur-slow) var(--ease-ios);
+}
+
+.settings-container .slider:before {
+  width: 24px;
+  height: 24px;
+  left: 2px;
+  bottom: 2px;
+  background-color: #fff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 1px 1px rgba(0, 0, 0, 0.16), 0 3px 1px rgba(0, 0, 0, 0.1);
+  transition: transform var(--dur-slow) var(--ease-spring), width var(--dur-base) var(--ease-spring);
+}
+
+.settings-container input:checked + .slider {
+  background-color: var(--ios-green);
+  border: none;
+}
+
+.settings-container input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+/* Press: knob stretches like on iOS */
+.settings-container .toggle-switch:active .slider:before {
+  width: 28px;
+}
+
+.settings-container .toggle-switch:active input:checked + .slider:before {
+  transform: translateX(14px);
+}
+
+.settings-container .toggle-switch input:focus-visible + .slider {
+  outline: 2px solid var(--nectar-accent, #0a84ff);
+  outline-offset: 2px;
+}
+
+/* ---------- Segmented control ---------- */
+
+.settings-container .unit-toggle-minimal {
+  padding: 2px;
+  gap: 0;
+  border-radius: 9px;
+  background: var(--ios-fill-soft);
+  border: none;
+}
+
+.settings-container .unit-toggle-minimal span {
+  width: auto;
+  min-width: 30px;
+  height: 26px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  border-radius: 7px;
+  font-size: var(--text-caption);
+  font-weight: 600;
+  transition: background-color var(--dur-base) var(--ease-ios), color var(--dur-base) var(--ease-ios), box-shadow var(--dur-base) var(--ease-ios);
+}
+
+.settings-container .unit-toggle-minimal span.active {
+  background: var(--ios-fill-strong);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18), 0 0 0 0.5px rgba(127, 127, 127, 0.25);
+  color: var(--nectar-text, #fff);
+}
+
+/* ---------- Pull-down menu (Dropdown) ---------- */
+
+.settings-container .dropdown-trigger {
+  min-height: 32px;
+  min-width: 96px;
+  padding: 0 8px 0 12px;
+  border: none;
+  border-radius: 9px;
+  background: var(--ios-fill-soft);
+  font-size: var(--text-footnote);
+  font-weight: 500;
+  transition: background-color var(--dur-fast) var(--ease-ios);
+}
+
+.settings-container .dropdown-trigger:hover,
+.settings-container .dropdown-trigger.open {
+  background: var(--ios-fill-strong);
+  border: none;
+}
+
+.settings-container .dropdown-menu {
+  padding: 6px;
+  border: 0.5px solid var(--ios-separator);
+  border-radius: var(--radius-lg);
+  background: var(--nectar-bg-expanded, rgba(28, 28, 30, 0.92));
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.05);
+  animation-duration: var(--dur-base);
+  animation-timing-function: var(--ease-spring);
+}
+
+.settings-container .dropdown-item {
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: var(--text-footnote);
+  transition: background-color var(--dur-fast) var(--ease-ios);
+}
+
+.settings-container .dropdown-item:hover {
+  background: var(--ios-fill-strong);
+}
+
+.settings-container .city-dropdown-name {
+  font-size: var(--text-footnote);
+}
+
+.settings-container .city-dropdown-country {
+  font-size: var(--text-caption);
+}
+
+/* ---------- Slider (iOS UISlider with filled track) ---------- */
+
+.settings-container .settings-slider {
+  box-sizing: content-box;
+  width: 120px;
+  height: 4px;
+  padding: 9px 0;                 /* larger hit area than the 4px track */
+  background-clip: content-box;
+  background-color: transparent;
+  background-image: linear-gradient(
+    to right,
+    var(--nectar-accent, #0a84ff) var(--fill, 0%),
+    var(--ios-fill) var(--fill, 0%)
+  );
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.settings-container .settings-slider::-webkit-slider-thumb {
+  width: 22px;
+  height: 22px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35), 0 0 0 0.5px rgba(0, 0, 0, 0.08);
+  transition: transform var(--dur-fast) var(--ease-spring);
+}
+
+.settings-container .settings-slider:active::-webkit-slider-thumb {
+  transform: scale(1.08);
+}
+
+.settings-container .settings-slider:focus-visible {
+  outline: none;
+}
+
+.settings-container .settings-slider:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--nectar-accent, #0a84ff) 55%, transparent), 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- Misc small controls ---------- */
+
+.settings-container .setting-group-label {
+  font-size: var(--text-caption);
+}
+
+.settings-container .processes-refresh-btn,
+.settings-container .process-end-btn {
+  min-width: 28px;
+  min-height: 28px;
+  justify-content: center;
+}

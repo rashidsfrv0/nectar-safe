@@ -1,4 +1,5 @@
 import { Palette, Droplet, Contrast, Droplets, Sun, Square, Maximize2 } from "lucide-react";
+import { sliderFill } from "./sliderFill";
 import { SettingRow } from "./SettingRow";
 import { SettingSection } from "./SettingSection";
 import { Dropdown } from "./Dropdown";
@@ -85,6 +86,7 @@ export function AppearanceTab({
             value={themeOpacity}
             onChange={(e) => handleOpacityChange(parseFloat(e.target.value))}
             className="settings-slider"
+              style={sliderFill(themeOpacity, 0.1, 1.0)}
           />
         </SettingRow>
 
@@ -103,6 +105,7 @@ export function AppearanceTab({
                 value={themeSaturation}
                 onChange={(e) => handleSaturationChange(parseFloat(e.target.value))}
                 className="settings-slider"
+              style={sliderFill(themeSaturation, 0, 1)}
               />
             </SettingRow>
 
@@ -120,6 +123,7 @@ export function AppearanceTab({
                 value={themeBrightness}
                 onChange={(e) => handleBrightnessChange(parseFloat(e.target.value))}
                 className="settings-slider"
+              style={sliderFill(themeBrightness, 0, 1)}
               />
             </SettingRow>
           </>
@@ -129,7 +133,7 @@ export function AppearanceTab({
       <SettingSection id="appearance-display" title={t("appearance.display.group")}>
         <SettingRow icon={Square} label={t("appearance.corners")} desc={t("appearance.corners.desc")}>
           <label className="toggle-switch">
-            <input type="checkbox" checked={cornersEnabled} onChange={toggleCorners} />
+            <input role="switch" type="checkbox" checked={cornersEnabled} onChange={toggleCorners} />
             <span className="slider"></span>
           </label>
         </SettingRow>

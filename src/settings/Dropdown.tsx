@@ -41,17 +41,21 @@ export function Dropdown({ value, options, onChange, placeholder, align = "right
       <button
         type="button"
         className={`dropdown-trigger ${open ? "open" : ""}`}
+        aria-haspopup="listbox"
+        aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
       >
         <span className="dropdown-trigger-label">{selected?.label ?? placeholder ?? value}</span>
         <ChevronDown size={12} strokeWidth={2.5} className="dropdown-chevron" />
       </button>
       {open && (
-        <div className={`dropdown-menu dropdown-menu--${align}`}>
+        <div className={`dropdown-menu dropdown-menu--${align}`} role="listbox">
           {options.map((opt) => (
             <button
               type="button"
               key={opt.value}
+              role="option"
+              aria-selected={opt.value === value}
               className={`dropdown-item ${opt.value === value ? "selected" : ""}`}
               onClick={() => {
                 onChange(opt.value);
