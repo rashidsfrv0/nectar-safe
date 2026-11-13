@@ -51,3 +51,15 @@
   --tab-overlays: #30b050;
   --tab-about: #636366;
 }
+
+/* Light theme: iOS uses slightly different system reds/greens in light mode */
+.light-mode {
+  --ios-red: #ff3b30;
+  --ios-green: #34c759;
+  --ios-fill: rgba(120, 120, 128, 0.2);
+  --ios-hairline: rgba(0, 0, 0, 0.12);
+}
+
+:root {
+  --ios-hairline: rgba(255, 255, 255, 0.14);
+}

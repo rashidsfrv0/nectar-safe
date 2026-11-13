@@ -10,6 +10,8 @@ import { initTheme } from "./theme";
 import { useCaldav, type CalEvent } from "./hooks/useCaldav";
 import { dateLocale, timeAgo, useT, weekdayNames } from "./i18n";
 import "./Calendar.css";
+import "./design-tokens.css";
+import "./ios-calendar.css";
 
 type View = "day" | "week" | "month" | "agenda";
 
@@ -379,8 +381,29 @@ function MonthView({ anchor, today, events, time, onSelect, onOpen }: MonthProps
             <div
               key={day.getTime()}
               className={classes.join(" ")}
+              role="button"
+              tabIndex={sameDay(day, anchor) ? 0 : -1}
+              aria-pressed={sameDay(day, anchor)}
+              aria-label={day.toLocaleDateString(dateLocale(), { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
               onClick={() => onSelect(day)}
               onDoubleClick={() => onOpen(day)}
+              onKeyDown={(e) => {
+                const step =
+                  e.key === "ArrowLeft" ? -1 : e.key === "ArrowRight" ? 1 : e.key === "ArrowUp" ? -7 : e.key === "ArrowDown" ? 7 : 0;
+                if (step) {
+                  e.preventDefault();
+                  const next = new Date(day);
+                  next.setDate(day.getDate() + step);
+                  onSelect(next);
+                  requestAnimationFrame(() => gridRef.current?.querySelector<HTMLElement>(".cw-cell.selected")?.focus());
+                } else if (e.key === "Enter") {
+                  e.preventDefault();
+                  onOpen(day);
+                } else if (e.key === " ") {
+                  e.preventDefault();
+                  onSelect(day);
+                }
+              }}
               onMouseEnter={(e) => showCard(e, day, list.length)}
               onMouseLeave={() => setHover(null)}
             >

@@ -1,0 +1,245 @@
+/*
+ * iOS-style layer for the Dock window. Loaded AFTER Dock.css.
+ *
+ * VISUAL ONLY. The dock's width/height/position are driven by framer-motion and are
+ * measured (getBoundingClientRect) to build the click-through hit region, so nothing
+ * here changes box sizes of .dock, .dock-icon or .dock-icon-wrapper.
+ */
+
+.dock-container {
+  font-family: var(--ios-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Dock bar material ---------- */
+
+.dock {
+  /* hairline edge + soft lift, like the iOS dock */
+  box-shadow:
+    inset 0 0 0 0.5px var(--ios-hairline),
+    0 10px 30px rgba(0, 0, 0, 0.28);
+}
+
+/* Running-app indicator: small dot like the iOS home indicator */
+.active-indicator {
+  background: var(--nectar-text, #fff);
+  box-shadow: none;
+  opacity: 0.9;
+}
+
+.dock-icon {
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.18),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.16);
+  transition: opacity var(--dur-base) var(--ease-ios);
+}
+
+.dock-show-desktop {
+  transition: background-color var(--dur-fast) var(--ease-ios);
+}
+
+/* ---------- Tooltips (iOS label bubble) ---------- */
+
+.tooltip,
+[data-tooltip]::after {
+  background: rgba(28, 28, 30, 0.82);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 8px;
+  font-family: var(--ios-font);
+  font-size: var(--text-caption);
+  font-weight: 500;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+}
+
+.tooltip {
+  transition: opacity var(--dur-base) var(--ease-ios), transform var(--dur-base) var(--ease-spring);
+}
+
+[data-tooltip]::after {
+  transition: opacity var(--dur-base) var(--ease-ios), transform var(--dur-base) var(--ease-spring);
+}
+
+/* ---------- Window preview popover ---------- */
+
+.preview-tooltip {
+  border: 0.5px solid var(--ios-hairline);
+  border-radius: var(--radius-lg);
+  background: rgba(28, 28, 30, 0.82);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.05);
+}
+
+.preview-item {
+  border-radius: 10px;
+  transition:
+    background-color var(--dur-fast) var(--ease-ios),
+    border-color var(--dur-fast) var(--ease-ios),
+    transform var(--dur-base) var(--ease-spring);
+}
+
+.preview-item img {
+  border-radius: 8px;
+}
+
+.preview-item:hover {
+  background: var(--ios-fill-strong);
+  border-color: transparent;
+}
+
+.preview-item:active {
+  border-color: transparent;
+}
+
+.preview-media-artist {
+  font-size: var(--text-caption);
+}
+
+.preview-close-btn {
+  transition:
+    opacity var(--dur-fast) var(--ease-ios),
+    background-color var(--dur-fast) var(--ease-ios),
+    box-shadow var(--dur-fast) var(--ease-ios),
+    transform var(--dur-fast) var(--ease-spring);
+}
+
+.preview-close-btn:hover {
+  background: var(--ios-red);
+  box-shadow: 0 4px 12px rgba(255, 69, 58, 0.4);
+}
+
+/* ---------- Context menu (iOS context menu) ---------- */
+
+.context-menu,
+.submenu {
+  border: 0.5px solid var(--ios-hairline);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.05);
+}
+
+.menu-item {
+  min-height: 34px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  transition: background-color var(--dur-fast) var(--ease-ios);
+}
+
+.menu-item.has-submenu {
+  justify-content: space-between;
+}
+
+.menu-item:hover,
+.menu-item.has-submenu:hover,
+.menu-item.has-submenu .submenu .menu-item:hover {
+  background: var(--ios-fill-strong);
+}
+
+/* Destructive action: red label, tinted hover (not a solid red block) */
+.menu-item.quit {
+  color: var(--ios-red);
+}
+
+.menu-item.quit:hover,
+.menu-item.has-submenu .submenu .menu-item.quit:hover {
+  background: color-mix(in srgb, var(--ios-red) 18%, transparent);
+  color: var(--ios-red);
+}
+
+.menu-divider {
+  margin: 4px 8px;
+  background: var(--ios-separator);
+}
+
+/* ---------- Add-app sheet ---------- */
+
+.add-app-popup {
+  border: 0.5px solid var(--ios-hairline);
+  border-radius: 20px;
+}
+
+.popup-search-row {
+  min-height: 36px;
+  box-sizing: border-box;
+  margin: 10px 10px 4px;
+  padding: 0 12px;
+  border-radius: 10px;
+  background: var(--ios-fill-soft);
+}
+
+.popup-search-input {
+  font-size: var(--text-body);
+}
+
+.popup-section-label {
+  font-size: var(--text-caption);
+  letter-spacing: 0.04em;
+}
+
+.popup-app-row {
+  border-radius: 12px;
+  transition: background-color var(--dur-fast) var(--ease-ios);
+}
+
+.popup-app-row:hover {
+  background: var(--ios-fill-soft);
+}
+
+.popup-app-icon {
+  border-radius: 9px;
+  box-shadow: inset 0 0 0 0.5px var(--ios-hairline);
+}
+
+.popup-app-pin {
+  min-width: 28px;
+  min-height: 28px;
+  transition:
+    opacity var(--dur-fast) var(--ease-ios),
+    background-color var(--dur-fast) var(--ease-ios),
+    color var(--dur-fast) var(--ease-ios);
+}
+
+.popup-empty {
+  font-size: var(--text-body);
+}
+
+/* ---------- Toast ---------- */
+
+.dock-toast {
+  border: 0.5px solid var(--ios-hairline);
+  border-radius: 12px;
+  font-size: var(--text-footnote);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+}
+
+/* ---------- Light theme ---------- */
+
+.light-mode .tooltip,
+.light-mode [data-tooltip]::after {
+  background: rgba(246, 246, 248, 0.86);
+  color: var(--nectar-text);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.08);
+}
+
+.light-mode .dock {
+  box-shadow: inset 0 0 0 0.5px var(--ios-hairline), 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* ---------- Reduced motion (CSS transitions only; framer-motion is separate) ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .dock-container *,
+  .dock-container *::before,
+  .dock-container *::after,
+  .add-app-popup *,
+  .context-menu * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

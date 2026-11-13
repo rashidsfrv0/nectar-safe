@@ -1,0 +1,367 @@
+/*
+ * iOS-style layer for the Calendar window. Loaded AFTER Calendar.css.
+ * Prefixed with .cw to out-rank the original compound selectors (e.g. .cw-cell.today ...).
+ * Key iOS trait: "today" is a red circle on the day number, not a filled cell.
+ */
+
+.cw {
+  --cw-seg-thumb: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-lg);
+  font-family: var(--ios-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+.light-mode .cw {
+  --cw-seg-thumb: #fff;
+}
+
+/* ---------- Accessibility ---------- */
+
+.cw :focus-visible {
+  outline: 2px solid var(--nectar-accent, #0a84ff);
+  outline-offset: 2px;
+}
+
+.cw .cw-cell:focus-visible {
+  outline-offset: -2px;
+  border-radius: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cw *,
+  .cw *::before,
+  .cw *::after {
+    transition-duration: 0.01ms !important;
+  }
+  .cw .spin {
+    animation-duration: 1.6s;
+  }
+}
+
+/* ---------- Title bar ---------- */
+
+.cw .cw-titlebar {
+  position: relative;
+  height: 38px;
+}
+
+.cw .cw-title-text {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--text-footnote);
+  letter-spacing: 0;
+}
+
+/* ---------- Sidebar: calendar list ---------- */
+
+.cw .cw-label {
+  font-size: var(--text-caption);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.cw .cw-sources button {
+  min-height: 34px;
+  padding: 6px 8px;
+  border-radius: 9px;
+  font-size: var(--text-footnote);
+  transition: background-color var(--dur-fast) var(--ease-ios);
+}
+
+.cw .cw-sources button:hover {
+  background: var(--ios-fill-soft);
+}
+
+/* Round check, like iOS list selection */
+.cw .cw-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+}
+
+.cw .cw-muted,
+.cw .cw-sync-row,
+.cw .cw-sync-row button,
+.cw .cw-manage,
+.cw .cw-error {
+  font-size: var(--text-caption);
+}
+
+.cw .cw-sync-row button,
+.cw .cw-manage {
+  min-height: 28px;
+  border-radius: 8px;
+  background: var(--ios-fill-soft);
+  transition: background-color var(--dur-fast) var(--ease-ios);
+}
+
+.cw .cw-sync-row button:hover:not(:disabled),
+.cw .cw-manage:hover {
+  background: var(--ios-fill-strong);
+}
+
+/* ---------- Toolbar ---------- */
+
+.cw .cw-heading {
+  font-family: var(--ios-font-display);
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+
+.cw .cw-segment {
+  gap: 0;
+  border-radius: 9px;
+  background: var(--ios-fill-soft);
+}
+
+.cw .cw-segment button {
+  min-height: 26px;
+  padding: 0 12px;
+  border-radius: 7px;
+  font-size: var(--text-caption);
+  font-weight: 600;
+  opacity: 0.75;
+  transition:
+    background-color var(--dur-base) var(--ease-ios),
+    opacity var(--dur-base) var(--ease-ios),
+    box-shadow var(--dur-base) var(--ease-ios);
+}
+
+.cw .cw-segment button.active {
+  opacity: 1;
+  font-weight: 600;
+  background: var(--cw-seg-thumb);
+  color: var(--cw-text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 0 0 0.5px rgba(127, 127, 127, 0.25);
+}
+
+.cw .cw-nav button {
+  min-width: 28px;
+  min-height: 28px;
+  border-radius: 8px;
+  transition: background-color var(--dur-fast) var(--ease-ios), opacity var(--dur-fast) var(--ease-ios);
+}
+
+.cw .cw-nav button:hover {
+  background: var(--ios-fill-soft);
+}
+
+/* "Today" in iOS red */
+.cw .cw-nav .cw-today {
+  padding: 0 10px;
+  background: transparent;
+  color: var(--ios-red);
+  font-size: var(--text-body);
+  font-weight: 600;
+}
+
+.cw .cw-nav .cw-today:hover {
+  background: var(--ios-fill-soft);
+}
+
+.cw .cw-primary {
+  min-height: 30px;
+  border-radius: 10px;
+  background: var(--nectar-accent, #0a84ff);
+  color: #fff;
+  font-size: var(--text-footnote);
+  font-weight: 600;
+}
+
+.cw .cw-primary.small {
+  min-height: 26px;
+  font-size: var(--text-caption);
+}
+
+.cw .cw-selected-strip {
+  border-radius: var(--radius-md);
+  background: var(--ios-fill-soft);
+  border: 0.5px solid var(--ios-separator);
+}
+
+.cw .cw-selected-date {
+  font-size: var(--text-body);
+}
+
+.cw .cw-selected-count {
+  font-size: var(--text-caption);
+  opacity: 0.8;
+}
+
+/* ---------- Month grid ---------- */
+
+.cw .cw-month,
+.cw .cw-week {
+  border: 0.5px solid var(--ios-separator);
+  border-radius: var(--radius-md);
+}
+
+.cw .cw-dow {
+  font-size: var(--text-caption);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  border-bottom: 0.5px solid var(--ios-separator);
+}
+
+/* iOS month view: hairline rows, no vertical lines */
+.cw .cw-cell {
+  border-right: none;
+  border-bottom: 0.5px solid var(--ios-separator);
+  transition: background-color var(--dur-fast) var(--ease-ios);
+}
+
+.cw .cw-cell::before {
+  border-radius: 10px;
+  transition: background-color var(--dur-fast) var(--ease-ios);
+}
+
+.cw .cw-cell:hover::before {
+  background: var(--ios-fill-soft);
+}
+
+.cw .cw-daynum {
+  min-width: 24px;
+  height: 24px;
+  font-size: var(--text-body);
+  font-weight: 500;
+}
+
+/* Today: red circle on the number only */
+.cw .cw-daynum.today,
+.cw .cw-cell.today .cw-daynum.today,
+.cw .cw-week-col.today .cw-week-head .cw-daynum.today {
+  background: var(--ios-red);
+  color: #fff;
+  font-weight: 700;
+}
+
+.cw .cw-cell.today::before {
+  background: transparent;
+}
+
+.cw .cw-cell.today .cw-chip {
+  background: color-mix(in srgb, var(--c) 24%, transparent);
+  color: inherit;
+}
+
+.cw .cw-cell.today .cw-more {
+  color: var(--cw-muted);
+}
+
+/* Selected day: soft cell fill + filled number (neutral), like iOS */
+.cw .cw-cell.selected::before,
+.cw .cw-cell.selected.today::before {
+  background: var(--ios-fill-soft);
+  box-shadow: none;
+}
+
+.cw .cw-cell.selected:not(.today) .cw-daynum {
+  background: var(--cw-text);
+  color: var(--cw-inverse);
+  font-weight: 700;
+}
+
+.cw .cw-chip {
+  border-radius: 5px;
+  font-size: var(--text-caption);
+}
+
+.cw .cw-chip.stacked i,
+.cw .cw-more,
+.cw .cw-compact {
+  font-size: 11px;
+}
+
+/* ---------- Week view ---------- */
+
+.cw .cw-week-col {
+  border-right: 0.5px solid var(--ios-separator);
+}
+
+.cw .cw-week-head {
+  border-bottom: 0.5px solid var(--ios-separator);
+  transition: background-color var(--dur-fast) var(--ease-ios);
+}
+
+.cw .cw-week-head:hover {
+  background: var(--ios-fill-soft);
+}
+
+.cw .cw-week-head em {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+.cw .cw-week-col.today .cw-week-head {
+  background: transparent;
+  color: var(--cw-text);
+}
+
+.cw .cw-week-col.today .cw-week-head * {
+  color: var(--cw-text);
+}
+
+.cw .cw-week-col.today .cw-week-head em {
+  color: var(--ios-red);
+}
+
+/* ---------- Day / agenda lists ---------- */
+
+.cw .cw-day-event {
+  padding: 10px 14px 10px 12px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--c) 18%, transparent);
+}
+
+.cw .cw-day-title {
+  font-size: var(--text-headline);
+  font-weight: 600;
+}
+
+.cw .cw-day-title em {
+  font-size: 11px;
+  border-radius: 5px;
+  background: var(--ios-red);
+}
+
+.cw .cw-day-time {
+  font-size: var(--text-caption);
+}
+
+.cw .cw-day-meta {
+  font-size: var(--text-caption);
+  opacity: 0.7;
+}
+
+.cw .cw-agenda-heading {
+  font-size: var(--text-footnote);
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: 0.7;
+}
+
+.cw .cw-empty-text {
+  font-size: var(--text-footnote);
+}
+
+/* ---------- Hover card ---------- */
+
+.cw .cw-hover {
+  border: 0.5px solid var(--ios-separator);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+}
+
+.cw .cw-hover-title,
+.cw .cw-hover-name {
+  font-size: var(--text-footnote);
+}
+
+.cw .cw-hover-meta,
+.cw .cw-hover-more {
+  font-size: var(--text-caption);
+}
