@@ -16,6 +16,7 @@ interface DropdownProps {
 
 export function Dropdown({ value, options, onChange, placeholder, align = "right" }: DropdownProps) {
   const [open, setOpen] = useState(false);
+  const [up, setUp] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,13 +44,22 @@ export function Dropdown({ value, options, onChange, placeholder, align = "right
         className={`dropdown-trigger ${open ? "open" : ""}`}
         aria-haspopup="listbox"
         aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          if (!open && ref.current) {
+            // Open upwards when the menu would run past the bottom of the window.
+            const rect = ref.current.getBoundingClientRect();
+            const menuHeight = Math.min(options.length * 30 + 12, 260);
+            const spaceBelow = window.innerHeight - rect.bottom - 8;
+            setUp(spaceBelow < menuHeight && rect.top > spaceBelow);
+          }
+          setOpen((o) => !o);
+        }}
       >
         <span className="dropdown-trigger-label">{selected?.label ?? placeholder ?? value}</span>
         <ChevronDown size={12} strokeWidth={2.5} className="dropdown-chevron" />
       </button>
       {open && (
-        <div className={`dropdown-menu dropdown-menu--${align}`} role="listbox">
+        <div className={`dropdown-menu dropdown-menu--${align}${up ? " dropdown-menu--up" : ""}`} role="listbox">
           {options.map((opt) => (
             <button
               type="button"

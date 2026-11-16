@@ -43,7 +43,7 @@ export function SettingRow({
         aria-labelledby={labelId}
       >
         <div className="setting-icon-bg" aria-hidden="true">
-          <Icon size={14} strokeWidth={1.5} />
+          <Icon size={14} strokeWidth={2} />
         </div>
         <div className="setting-info">
           <span id={labelId} className="setting-label">{label}</span>

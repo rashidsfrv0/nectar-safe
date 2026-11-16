@@ -123,7 +123,7 @@ export function NotchClock({
             </div>
 
             <div className="timer-controls-new">
-              <button onClick={onToggleTimer} className="timer-btn primary">
+              <button onClick={onToggleTimer} className={`timer-btn primary${isTimerRunning ? " running" : ""}`}>
                 {isTimerRunning ? t("clock.pause") : t("clock.start")}
               </button>
               <button onClick={onResetTimer} className="timer-btn secondary">
@@ -168,7 +168,7 @@ export function NotchClock({
             </div>
 
             <div className="timer-controls-new">
-              <button onClick={stopwatch.toggle} className="timer-btn primary">
+              <button onClick={stopwatch.toggle} className={`timer-btn primary${stopwatch.running ? " running" : ""}`}>
                 {stopwatch.running ? t("clock.pause") : t("clock.start")}
               </button>
               <button onClick={stopwatch.lap} className="timer-btn secondary" disabled={!stopwatch.running && stopwatch.base === 0}>

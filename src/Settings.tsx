@@ -97,7 +97,7 @@ function SettingsApp() {
           ))}
         </nav>
 
-        <div className="settings-content">
+        <div className="settings-content" data-tab={activeTab}>
           {activeTab !== "calendar-sync" && (
             <h1 className="settings-large-title">{t(TABS.find((x) => x.id === activeTab)?.labelKey ?? "settings.title")}</h1>
           )}

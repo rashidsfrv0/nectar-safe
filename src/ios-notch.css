@@ -1,0 +1,339 @@
+/*
+ * iOS-style layer for the Notch window. Loaded AFTER App.css.
+ *
+ * VISUAL ONLY. The notch is sized by measured/fixed containers and its outer shape includes
+ * concave "bridge" corners drawn with pseudo-elements, so this file does NOT change the notch
+ * outline, border, padding, font-family or font sizes (dual-clock widths are measured from the
+ * current font). It only restyles materials, colours, corner radii and states inside panels.
+ * Rules are prefixed with .nectar to out-rank the compound selectors in App.css.
+ */
+
+/* ---------- Accessibility ---------- */
+
+.nectar :focus-visible {
+  outline: 2px solid var(--nectar-accent, #0a84ff);
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nectar *,
+  .nectar *::before,
+  .nectar *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- Tooltips ---------- */
+
+[data-tooltip]::after,
+.widget-tip {
+  background: rgba(28, 28, 30, 0.82);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+}
+
+/* ---------- Control Center: tiles ---------- */
+
+.nectar .cc-pill-tile {
+  border-radius: 12px;
+  transition:
+    background-color var(--dur-fast) var(--ease-ios),
+    border-color var(--dur-fast) var(--ease-ios),
+    transform var(--dur-base) var(--ease-spring);
+}
+
+.nectar .cc-pill-tile:hover {
+  transform: none;
+}
+
+.nectar .cc-pill-tile:active {
+  transform: scale(0.97);
+}
+
+.nectar .cc-pill-icon-wrapper {
+  transition:
+    background-color var(--dur-base) var(--ease-ios),
+    color var(--dur-base) var(--ease-ios);
+}
+
+/* Active tile: translucent tile + coloured icon disc (iOS Control Center), instead of an
+   inverted white block. */
+.nectar .cc-pill-tile.active {
+  background: var(--ios-fill-strong);
+  border-color: transparent;
+}
+
+.nectar .cc-pill-tile.active .cc-pill-title {
+  color: var(--nectar-text, #fff);
+}
+
+.nectar .cc-pill-tile.active .cc-pill-status {
+  color: var(--nectar-text-muted, rgba(255, 255, 255, 0.6));
+}
+
+.nectar .cc-pill-tile.active .cc-pill-icon-wrapper {
+  background: var(--nectar-accent, #0a84ff);
+  color: #fff;
+}
+
+.nectar .cc-pill-tile.active .cc-pill-more {
+  color: var(--nectar-text, #fff);
+  opacity: 0.7;
+}
+
+.nectar .cc-pill-tile.active .cc-pill-more:hover {
+  opacity: 1;
+  background: rgba(128, 128, 128, 0.25);
+}
+
+/* ---------- Control Center: round action buttons ---------- */
+
+.nectar .cc-circular-btn {
+  transition:
+    background-color var(--dur-fast) var(--ease-ios),
+    color var(--dur-fast) var(--ease-ios),
+    transform var(--dur-base) var(--ease-spring),
+    box-shadow var(--dur-base) var(--ease-ios);
+}
+
+.nectar .cc-circular-btn:hover {
+  transform: none;
+}
+
+.nectar .cc-circular-btn:active {
+  transform: scale(0.92);
+}
+
+.nectar .cc-circular-btn.active,
+.nectar .cc-circular-btn.active:hover {
+  background: var(--nectar-accent, #0a84ff);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--nectar-accent, #0a84ff) 45%, transparent);
+}
+
+/* ---------- Control Center: sliders (thicker, rounded, like iOS) ----------
+   No overflow:hidden on the track: the invisible range input is its child and extends
+   beyond the 8px bar to give a larger click/drag area. */
+
+.nectar .cc-classic-slider-track {
+  height: 8px;
+  border-radius: 4px;
+}
+
+.nectar .cc-classic-fill {
+  border-radius: 4px;
+}
+
+.nectar .cc-classic-slider-row:hover .cc-classic-fill {
+  box-shadow: none;
+}
+
+.nectar .cc-classic-percentage {
+  font-size: 10px;
+}
+
+/* ---------- Segmented controls (calendar views, timer tabs) ---------- */
+
+.nectar .cal-views,
+.nectar .clock-tabs {
+  border-radius: 9px;
+  background: var(--ios-fill-soft);
+}
+
+.nectar .cal-views button,
+.nectar .clock-tabs button {
+  border-radius: 7px;
+  opacity: 0.7;
+  transition:
+    background-color var(--dur-base) var(--ease-ios),
+    opacity var(--dur-base) var(--ease-ios),
+    box-shadow var(--dur-base) var(--ease-ios);
+}
+
+.nectar .cal-views button:hover,
+.nectar .clock-tabs button:hover {
+  opacity: 0.95;
+}
+
+.nectar .cal-views button.active,
+.nectar .clock-tabs button.active {
+  opacity: 1;
+  background: color-mix(in srgb, var(--nectar-text, #fff) 22%, transparent);
+  color: var(--nectar-text, #fff);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* ---------- Calendar: today is a red capsule, iOS style ---------- */
+
+.nectar .calendar-day {
+  border-radius: 8px;
+}
+
+.nectar .calendar-day.today {
+  background: var(--ios-red);
+  color: #fff;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.nectar .calendar-day.selected.today {
+  box-shadow: 0 0 0 2px var(--nectar-bg-expanded, #000), 0 0 0 3.5px var(--ios-red);
+}
+
+.nectar .cal-today {
+  color: var(--ios-red);
+}
+
+.nectar .cal-week-row {
+  border-radius: 8px;
+}
+
+.nectar .cal-week-row.today .cal-week-label b {
+  background: var(--ios-red);
+  color: #fff;
+}
+
+.nectar .cal-week-row.today {
+  background: color-mix(in srgb, var(--ios-red) 14%, transparent);
+}
+
+.nectar .cal-day-title em {
+  background: var(--ios-red);
+}
+
+/* ---------- Timer / stopwatch ---------- */
+
+.nectar .timer-btn {
+  border-radius: 10px;
+  transition:
+    background-color var(--dur-fast) var(--ease-ios),
+    opacity var(--dur-fast) var(--ease-ios),
+    transform var(--dur-base) var(--ease-spring);
+}
+
+.nectar .timer-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+/* Start = green, Pause = orange (iOS Clock) */
+.nectar .timer-btn.primary {
+  background: var(--ios-green);
+  color: #fff;
+}
+
+.nectar .timer-btn.primary.running {
+  background: #ff9f0a;
+  color: #fff;
+}
+
+.nectar .preset-btn-small {
+  border-radius: 8px;
+  transition:
+    background-color var(--dur-fast) var(--ease-ios),
+    transform var(--dur-base) var(--ease-spring);
+}
+
+.nectar .preset-btn-small:active {
+  transform: scale(0.96);
+}
+
+.nectar .timer-custom input,
+.nectar .timer-custom button {
+  border-radius: 8px;
+}
+
+.nectar .timer-custom input:focus {
+  border-color: var(--nectar-accent, #0a84ff);
+}
+
+.nectar .timer-custom button {
+  background: var(--nectar-accent, #0a84ff);
+  color: #fff;
+}
+
+.nectar .sw-lap {
+  border-radius: 6px;
+}
+
+/* ---------- Wi-Fi / Bluetooth lists ---------- */
+
+.nectar .cv-row {
+  border-radius: 10px;
+  transition: background-color var(--dur-fast) var(--ease-ios);
+}
+
+.nectar .cv-row.connected {
+  outline: 1px solid color-mix(in srgb, var(--nectar-accent, #0a84ff) 70%, transparent);
+}
+
+.nectar .cv-action.danger {
+  color: var(--ios-red);
+}
+
+.nectar .cv-password input {
+  border-radius: 8px;
+}
+
+.nectar .cv-password input:focus {
+  border-color: var(--nectar-accent, #0a84ff);
+}
+
+.nectar .cv-password button {
+  border-radius: 8px;
+  background: var(--nectar-accent, #0a84ff);
+  color: #fff;
+}
+
+/* ---------- Tour ---------- */
+
+.nectar .tour-btn {
+  border-radius: 10px;
+  background: var(--nectar-accent, #0a84ff);
+  color: #fff;
+}
+
+.nectar .tour-btn.ghost {
+  background: var(--ios-fill-soft);
+  color: inherit;
+}
+
+.nectar .tour-dots i.on {
+  background: var(--nectar-accent, #0a84ff);
+  opacity: 1;
+}
+
+/* ---------- Shelf ---------- */
+
+.nectar .shelf-empty {
+  border-radius: 14px;
+}
+
+.nectar .shelf-thumb {
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 0.5px var(--ios-hairline);
+}
+
+.nectar .shelf-remove {
+  background: rgba(60, 60, 67, 0.9);
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.2);
+  transition: opacity var(--dur-fast) var(--ease-ios);
+}
+
+/* ---------- Media player ---------- */
+
+.nectar .cmp-output-item {
+  border-radius: 8px;
+  transition: background-color var(--dur-fast) var(--ease-ios);
+}
+
+.nectar .cmp-output-item:hover {
+  background: var(--ios-fill-soft);
+}
+
+.nectar .cmp-btn:focus-visible {
+  outline: 2px solid var(--nectar-accent, #0a84ff);
+  outline-offset: -2px;
+}

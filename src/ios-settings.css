@@ -173,17 +173,24 @@ body {
   background: var(--ios-separator);
 }
 
-/* Tinted squircle behind row icons */
-.settings-container .setting-icon-bg {
+/* Solid squircle in the page's colour with a white glyph, like iOS Settings.
+   The colour follows the current tab (same as its sidebar icon). */
+.settings-container .settings-content { --row-icon: var(--tab-general); }
+.settings-container .settings-content[data-tab="appearance"] { --row-icon: var(--tab-appearance); }
+.settings-container .settings-content[data-tab="notch"],
+.settings-container .settings-content[data-tab="calendar-sync"] { --row-icon: var(--tab-notch); }
+.settings-container .settings-content[data-tab="dock"] { --row-icon: var(--tab-dock); }
+.settings-container .settings-content[data-tab="overlays"] { --row-icon: var(--tab-overlays); }
+.settings-container .settings-content[data-tab="about"] { --row-icon: var(--tab-about); }
+
+.settings-container .setting-icon-bg,
+.settings-container .setting-item:hover .setting-icon-bg {
   width: 28px;
   height: 28px;
   border-radius: 7px;
-  background: color-mix(in srgb, var(--nectar-accent, #0a84ff) 20%, transparent);
-  color: var(--nectar-accent, #0a84ff);
-}
-
-.settings-container .setting-item:hover .setting-icon-bg {
-  color: var(--nectar-accent, #0a84ff);
+  background: var(--row-icon, var(--tab-general));
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), inset 0 0 0 0.5px rgba(255, 255, 255, 0.18);
 }
 
 /* Collapsible section header: keep fused-card pattern, iOS sizing */
@@ -215,9 +222,10 @@ body {
   background: var(--ios-fill-strong);
 }
 
-.settings-container .setting-item.action.danger .setting-icon-bg {
-  background: rgba(255, 69, 58, 0.18);
-  color: var(--ios-red);
+.settings-container .setting-item.action.danger .setting-icon-bg,
+.settings-container .setting-item.action.danger:hover .setting-icon-bg {
+  background: var(--ios-red);
+  color: #fff;
 }
 
 /* ---------- Switch (iOS UISwitch) ---------- */
@@ -316,8 +324,20 @@ body {
   border: none;
 }
 
+/* A group that holds an open menu must not clip it (groups are overflow:hidden for rounded corners) */
+.settings-container .setting-group:has(.dropdown-menu) {
+  overflow: visible;
+}
+
+.settings-container .dropdown-menu--up {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
 .settings-container .dropdown-menu {
-  padding: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 4px;
   border: 0.5px solid var(--ios-separator);
   border-radius: var(--radius-lg);
   background: var(--nectar-bg-expanded, rgba(28, 28, 30, 0.92));
@@ -329,7 +349,7 @@ body {
 }
 
 .settings-container .dropdown-item {
-  min-height: 34px;
+  min-height: 30px;
   padding: 0 10px;
   border-radius: 8px;
   font-size: var(--text-footnote);
@@ -397,4 +417,22 @@ body {
   min-width: 28px;
   min-height: 28px;
   justify-content: center;
+}
+
+/* ---------- Scrollbar: visible on both themes ---------- */
+
+.settings-container .settings-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.settings-container .settings-content::-webkit-scrollbar-thumb {
+  background: rgba(127, 127, 127, 0.45);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  border-radius: 10px;
+}
+
+.settings-container .settings-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(127, 127, 127, 0.7);
+  background-clip: padding-box;
 }
