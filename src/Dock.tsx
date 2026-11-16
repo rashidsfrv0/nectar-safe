@@ -372,8 +372,29 @@ const Dock = memo(function Dock() {
 
   useEffect(() => {
     let lastSent = "";
+
+    // Sizes each icon's invisible hit cell so it reaches the dock's real top and bottom edges.
+    // The space above/below the icons depends on theme, scale and mode, so it is measured, not hard-coded.
+    const syncHitCell = () => {
+      const dock = dockRef.current;
+      const wrap = dock?.querySelector<HTMLElement>(".dock-icon-wrapper");
+      if (!dock || !wrap || !dock.offsetHeight || !wrap.offsetHeight) return;
+      const d = dock.getBoundingClientRect();
+      const w = wrap.getBoundingClientRect();
+      // Rects include the dock's own scale transform; the CSS variables live in its unscaled space.
+      const s = d.height / dock.offsetHeight;
+      // Skip while the icon is still animating in (its scale then differs from the dock's).
+      if (!(s > 0) || Math.abs(w.height / wrap.offsetHeight - s) > 0.02) return;
+      const clamp = (v: number) => Math.min(40, Math.max(0, v));
+      const top = `${clamp((w.top - d.top) / s).toFixed(1)}px`;
+      const bottom = `${clamp((d.bottom - w.bottom) / s).toFixed(1)}px`;
+      if (dock.style.getPropertyValue("--cell-top") !== top) dock.style.setProperty("--cell-top", top);
+      if (dock.style.getPropertyValue("--cell-bottom") !== bottom) dock.style.setProperty("--cell-bottom", bottom);
+    };
+
     const updateRect = () => {
       if (dockRef.current) {
+        syncHitCell();
         const rect = dockRef.current.getBoundingClientRect();
         const hasPreview = !!previewData;
         const next = {

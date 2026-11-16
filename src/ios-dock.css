@@ -252,8 +252,9 @@
 .dock-icon-wrapper::before {
   content: "";
   position: absolute;
-  top: -8px;
-  bottom: -8px;
+  /* --cell-top / --cell-bottom are measured in Dock.tsx (distance from the icon to the dock's edge) */
+  top: calc(-1 * var(--cell-top, 8px));
+  bottom: calc(-1 * var(--cell-bottom, 8px));
   left: -6px;
   right: -6px;
 }
