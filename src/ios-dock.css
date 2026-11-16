@@ -241,3 +241,19 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---------- Icon hit cell ----------
+   An invisible square around each icon: the gap between icons (12px) is split in half and the
+   dock's 8px padding is covered above and below, so every pixel of the dock belongs to exactly
+   one icon. Hovering, clicking, right-clicking and dragging work from anywhere in the cell.
+   A pseudo-element is used instead of padding so layout, tooltips, previews and the active dot
+   (all positioned from the icon's box) stay exactly where they are. The wrapper itself never
+   moves (only the .dock-icon inside it lifts), so the cell cannot cause hover flicker. */
+.dock-icon-wrapper::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  bottom: -8px;
+  left: -6px;
+  right: -6px;
+}

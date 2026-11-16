@@ -1078,7 +1078,16 @@ const Dock = memo(function Dock() {
       transition={{ opacity: { duration: 0.15, delay }, scale: { type: "spring", stiffness: 400, damping: 25, delay } }}
       className="dock-icon-wrapper"
       onMouseEnter={() => setHoveredApp(id)}
+      onPointerDown={() => setPressedApp(id)}
+      onPointerUp={() => setPressedApp(null)}
+      onPointerCancel={() => setPressedApp(null)}
       onMouseLeave={() => { setHoveredApp(null); setPressedApp(null); }}
+      onClick={(e) => {
+        e.stopPropagation();
+        // Popups anchor to the icon itself, not to the larger hit cell.
+        const iconEl = e.currentTarget.querySelector(".dock-icon") ?? e.currentTarget;
+        onClick(iconEl.getBoundingClientRect(), e);
+      }}
     >
       {(!dockPreviewEnabled || hoveredApp === id) && <div className="tooltip">{label}</div>}
       <motion.div
@@ -1088,7 +1097,6 @@ const Dock = memo(function Dock() {
         onPointerDown={() => setPressedApp(id)}
         onPointerUp={() => setPressedApp(null)}
         onPointerCancel={() => setPressedApp(null)}
-        onClick={(e) => { e.stopPropagation(); onClick(e.currentTarget.getBoundingClientRect(), e); }}
       >
         {icon}
       </motion.div>
@@ -1149,7 +1157,14 @@ const Dock = memo(function Dock() {
                   className="dock-icon-wrapper"
                   onContextMenu={(e) => handleContextMenu(e, startItem)}
                   onMouseEnter={() => setHoveredApp(itemKey(startItem))}
+                  onPointerDown={() => setPressedApp(itemKey(startItem))}
+                  onPointerUp={() => setPressedApp(null)}
+                  onPointerCancel={() => setPressedApp(null)}
                   onMouseLeave={() => { setHoveredApp(null); setPressedApp(null); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAppClick(startItem);
+                  }}
                 >
                   {(!dockPreviewEnabled || (dockPreviewEnabled && hoveredApp === itemKey(startItem))) && (
                     <div className="tooltip">{t("dockmenu.start")}</div>
@@ -1161,10 +1176,6 @@ const Dock = memo(function Dock() {
                     onPointerDown={() => setPressedApp(itemKey(startItem))}
                     onPointerUp={() => setPressedApp(null)}
                     onPointerCancel={() => setPressedApp(null)}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAppClick(startItem);
-                    }}
                   >
                     <img src={resolveStartIcon(startIcon)} alt="Start" className={startIcon === "default" ? "nectar-icon-img" : "nectar-icon-img start-img"} style={startIcon.startsWith("custom:") ? { borderRadius: "8px" } : undefined} draggable={false} />
                   </motion.div>
@@ -1178,7 +1189,14 @@ const Dock = memo(function Dock() {
                   transition={{ opacity: { duration: 0.15, delay: 0.18 }, scale: { type: "spring", stiffness: 400, damping: 25, delay: 0.18 } }}
                   className="dock-icon-wrapper"
                   onMouseEnter={() => setHoveredApp('search')}
+                  onPointerDown={() => setPressedApp('search')}
+                  onPointerUp={() => setPressedApp(null)}
+                  onPointerCancel={() => setPressedApp(null)}
                   onMouseLeave={() => { setHoveredApp(null); setPressedApp(null); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    invoke('open_app', { appName: 'search' }).catch((err) => console.error('Failed to open search:', err));
+                  }}
                 >
                   {(!dockPreviewEnabled || (dockPreviewEnabled && hoveredApp === 'search')) && (
                     <div className="tooltip">{t("dockmenu.search")}</div>
@@ -1190,10 +1208,6 @@ const Dock = memo(function Dock() {
                     onPointerDown={() => setPressedApp('search')}
                     onPointerUp={() => setPressedApp(null)}
                     onPointerCancel={() => setPressedApp(null)}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      invoke('open_app', { appName: 'search' }).catch((err) => console.error('Failed to open search:', err));
-                    }}
                   >
                     <SearchIcon />
                   </motion.div>
@@ -1207,7 +1221,14 @@ const Dock = memo(function Dock() {
                   transition={{ opacity: { duration: 0.15, delay: 0.2 }, scale: { type: "spring", stiffness: 400, damping: 25, delay: 0.2 } }}
                   className="dock-icon-wrapper"
                   onMouseEnter={() => setHoveredApp('calendar')}
+                  onPointerDown={() => setPressedApp('calendar')}
+                  onPointerUp={() => setPressedApp(null)}
+                  onPointerCancel={() => setPressedApp(null)}
                   onMouseLeave={() => { setHoveredApp(null); setPressedApp(null); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    invoke('open_calendar_window').catch((err) => console.error('Failed to open calendar:', err));
+                  }}
                 >
                   {(!dockPreviewEnabled || (dockPreviewEnabled && hoveredApp === 'calendar')) && (
                     <div className="tooltip">{t("dockmenu.calendar")}</div>
@@ -1219,10 +1240,6 @@ const Dock = memo(function Dock() {
                     onPointerDown={() => setPressedApp('calendar')}
                     onPointerUp={() => setPressedApp(null)}
                     onPointerCancel={() => setPressedApp(null)}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      invoke('open_calendar_window').catch((err) => console.error('Failed to open calendar:', err));
-                    }}
                   >
                     <CalendarIcon />
                   </motion.div>
@@ -1288,6 +1305,9 @@ const Dock = memo(function Dock() {
                       exit={ITEM_EXIT}
                       transition={ITEM_ENTRY_TRANSITION}
                       onMouseEnter={() => setHoveredApp(itemKey(app))}
+                      onPointerDown={() => setPressedApp(itemKey(app))}
+                      onPointerUp={() => setPressedApp(null)}
+                      onPointerCancel={() => setPressedApp(null)}
                       onMouseLeave={() => { if (!isPreviewHoveredRef.current) { setHoveredApp(null); setPressedApp(null); } }}
                     >
                 <AnimatePresence>
@@ -1393,6 +1413,9 @@ const Dock = memo(function Dock() {
                       exit={{ opacity: 0, scale: 0, transition: { duration: 0.12 } }}
                       transition={ITEM_ENTRY_TRANSITION}
                       onMouseEnter={() => setHoveredApp(itemKey(app))}
+                      onPointerDown={() => setPressedApp(itemKey(app))}
+                      onPointerUp={() => setPressedApp(null)}
+                      onPointerCancel={() => setPressedApp(null)}
                       onMouseLeave={() => { if (!isPreviewHoveredRef.current) { setHoveredApp(null); setPressedApp(null); } }}
                     >
                       <AnimatePresence>
@@ -1491,6 +1514,9 @@ const Dock = memo(function Dock() {
                       exit={ITEM_EXIT}
                       transition={ITEM_ENTRY_TRANSITION}
                       onMouseEnter={() => setHoveredApp(itemKey(app))}
+                      onPointerDown={() => setPressedApp(itemKey(app))}
+                      onPointerUp={() => setPressedApp(null)}
+                      onPointerCancel={() => setPressedApp(null)}
                       onMouseLeave={() => { if (!isPreviewHoveredRef.current) { setHoveredApp(null); setPressedApp(null); } }}
                     >
                       <AnimatePresence>
